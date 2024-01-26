@@ -1,0 +1,41 @@
+import { Outlet, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { Home, Profile, Login, Register, ResetPassword } from './pages';
+import { useSelector } from 'react-redux';
+
+function Layout() {
+  const { user } = useSelector((state) => state.user);
+  // console.log(user);
+  const location = useLocation();
+  return (
+    <>
+      {user?.token ? (
+        <Outlet />
+      ) : (
+        <Navigate to="/login" state={{ from: location }} replace />
+      )}
+    </>
+  );
+}
+
+function App() {
+  const { theme, user } = useSelector((state) => ({
+    theme: state.theme.theme,
+    user: state.user.user,
+  }));
+
+  return (
+    <div data-theme={theme} className="w-full min-h-[100vh]">
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/profile/:id?" element={<Profile />} />
+        </Route>
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/reser-password" element={<ResetPassword />} />
+      </Routes>
+    </div>
+  );
+}
+
+export default App;
