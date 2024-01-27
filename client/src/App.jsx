@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux';
 
 function Layout() {
   const { user } = useSelector((state) => state.user);
-  // console.log(user);
   const location = useLocation();
   return (
     <>
@@ -32,7 +31,7 @@ function App() {
         </Route>
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/reser-password" element={<ResetPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
       </Routes>
     </div>
   );
