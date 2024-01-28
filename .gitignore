@@ -1,4 +1,5 @@
 theme.txt
+client/src/assets/
 # Logs
 logs
 *.log

@@ -9,7 +9,7 @@ const Login = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({ mode: 'onChange' });
+  } = useForm({ mode: 'onSubmit' });
 
   const onSubmit = async (data) => {};
 
@@ -18,7 +18,7 @@ const Login = () => {
   const dispatch = useDispatch();
 
   return (
-    <div className="bg-slate-950 w-full h-screen flex flex-col items-center justify-center pb-5">
+    <div className="bg-slate-950 w-full min-h-screen flex flex-col items-center justify-center py-14">
       <div className="text-lg font-bold mb-4 text-indigo-300">birb</div>
       <div className="text-slate-300 w-10/12 sm:w-4/12 sm:h-4/6 flex flex-col rounded-xl overflow-hidden  ring-2 ring-indigo-900 p-5 gap-3 pb-10">
         <div className="text-indigo-300 text-2xl mb-3 font-bold">
@@ -35,7 +35,7 @@ const Login = () => {
             register={register('email', {
               required: 'Email Address is required',
             })}
-            error={errors.email ? errors.email.message : ''}
+            error={errors.email && errors.email.message}
           />
           <TextInput
             name="password"
@@ -76,7 +76,7 @@ const Login = () => {
         <div className="text-indigo-300 text-sm flex flex-row justify-center">
           <p>Don't have an account ?</p>
           <Link to="/register" className="underline">
-            Create Account
+            Register
           </Link>
         </div>
       </div>
