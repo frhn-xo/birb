@@ -17,13 +17,8 @@ function Layout() {
 }
 
 function App() {
-  const { theme, user } = useSelector((state) => ({
-    theme: state.theme.theme,
-    user: state.user.user,
-  }));
-
   return (
-    <div data-theme={theme} className="w-full min-h-[100vh]">
+    <div className="w-full min-h-[100vh]">
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />

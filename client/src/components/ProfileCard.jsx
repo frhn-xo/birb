@@ -7,7 +7,7 @@ import { CiLocationOn } from 'react-icons/ci';
 import moment from 'moment';
 
 import { NoProfile } from '../assets';
-import { UpdateProfile } from '../redux/userSlice';
+import { updateProfile } from '../redux/userSlice';
 
 const ProfileCard = ({ user }) => {
   const { user: data, edit } = useSelector((state) => state.user);
@@ -25,7 +25,7 @@ const ProfileCard = ({ user }) => {
             />
 
             <div className="flex flex-col justify-center">
-              <p className="text-lg font-medium ">{user?.firstName}</p>
+              <p className="text-lg font-medium ">{user?.name}</p>
             </div>
           </Link>
 
@@ -34,7 +34,7 @@ const ProfileCard = ({ user }) => {
               <LiaEditSolid
                 size={30}
                 className=" text-indigo-300 hover:bg-indigo-700 cursor-pointer rounded-xl px-1"
-                onClick={() => dispatch(UpdateProfile(true))}
+                onClick={() => dispatch(updateProfile(true))}
               />
             ) : (
               <button
@@ -50,7 +50,7 @@ const ProfileCard = ({ user }) => {
         <div className="w-full flex flex-col gap-2 py-4 border-b border-indigo-900">
           <div className="flex gap-2 items-center ">
             <CiLocationOn className="text-xl " />
-            <span>{user?.location ?? 'Add Location'}</span>
+            <span>{user?.bio ?? 'Add Bio'}</span>
           </div>
 
           <div className="flex gap-2 items-center ">

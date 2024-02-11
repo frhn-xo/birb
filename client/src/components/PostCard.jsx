@@ -51,7 +51,7 @@ const CommentForm = ({ user, id, replyAt, getComments }) => {
       )}
       <div className="flex items-end justify-end pb-2">
         {loading ? (
-          '....'
+          '....loading'
         ) : (
           <CustomButton
             title="Reply"
@@ -89,7 +89,7 @@ const PostCard = ({ post, user, deletePost, likePost }) => {
         <div className="w-full flex justify-between">
           <div className="">
             <Link to={`/profile/${post?.userId?._id}`}>
-              <p className="font-medium text-md">{post?.userId.firstName}</p>
+              <p className="font-medium text-md">{post?.userId.name}</p>
             </Link>
           </div>
           <span className="text-xs text-slate-700">
@@ -164,7 +164,7 @@ const PostCard = ({ post, user, deletePost, likePost }) => {
             getComments={() => getComments(post?._id)}
           />
           {loading ? (
-            '....'
+            '....loading'
           ) : comments?.length > 0 ? (
             comments?.map((comment) => (
               <div className="w-full py-2" key={comment?._id}>
@@ -172,14 +172,14 @@ const PostCard = ({ post, user, deletePost, likePost }) => {
                   <Link to={`/profile/${comment?.userId?._id}`}>
                     <img
                       src={comment?.userId?.profileUrl ?? NoProfile}
-                      alt={comment?.user?.firstName}
+                      alt={comment?.user?.name}
                       className="w-6 h-6 rounded-full object-cover"
                     />
                   </Link>
                   <div>
                     <Link to={`/profile/${comment?.userId?._id}`}>
                       <p className="font-medium text-sm">
-                        {comment?.userId.firstName}
+                        {comment?.userId.name}
                       </p>
                     </Link>
                     <span className="text-xs text-slate-700">

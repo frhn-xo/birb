@@ -5,10 +5,9 @@ import logo from '../assets/birb.png';
 import { useForm } from 'react-hook-form';
 import TextInput from './TextInput';
 import CustomButton from './CustomButton';
-import { UpdateProfile } from '../redux/userSlice';
+import { updateProfile } from '../redux/userSlice';
 
 const TopBar = () => {
-  const { theme } = useSelector((state) => state.theme);
   const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const {
@@ -42,7 +41,7 @@ const TopBar = () => {
           title="Edit"
           containerStyles="md:hidden justify-center bg-black text-indigo-300 rounded-xl hover:bg-indigo-700 font-semibold ml-auto mt-2 p-3 py-2
           hover:text-slate-300"
-          onClick={() => dispatch(UpdateProfile(true))}
+          onClick={() => dispatch(updateProfile(true))}
         />
         <CustomButton
           onClick={() => dispatch(Logout())}

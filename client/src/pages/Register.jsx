@@ -2,20 +2,41 @@ import React, { useState } from 'react';
 import { CustomButton, TextInput } from '../components';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { apiRequest } from '../utils';
 
 const Register = () => {
+  const [errMsg, setErrMsg] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({ mode: 'onSubmit' });
 
-  const onSubmit = async (data) => {};
-
-  const [errMsg, setErrMsg] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const dispatch = useDispatch();
+  const onSubmit = async (data) => {
+    setIsSubmitting(true);
+    try {
+      const res = await apiRequest({
+        url: '/auth/register',
+        data,
+        method: 'POST',
+      });
+      console.log(res);
+      if (res?.status === 'failed') {
+        setErrMsg(res);
+      } else {
+        setErrMsg(res);
+        setInterval(() => {
+          window.location.replace('/login');
+        }, 800);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="bg-slate-950 w-full min-h-screen py-14 flex flex-col items-center justify-center ">
@@ -33,6 +54,10 @@ const Register = () => {
             label="Name"
             register={register('name', {
               required: 'Name is required',
+              pattern: {
+                value: /^[a-zA-Z0-9_.]+$/,
+                message: 'Name should only contain underscores and dots.',
+              },
             })}
             error={errors.name ? errors.name.message : ''}
           />
@@ -66,7 +91,7 @@ const Register = () => {
             </span>
           )}
           {isSubmitting ? (
-            '....'
+            '....loading'
           ) : (
             <CustomButton
               containerStyles="justify-center text-slate-300 bg-indigo-700 rounded-lg font-semibold px-3 py-2 pt-1.5 my-3 w-full"

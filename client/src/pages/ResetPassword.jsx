@@ -47,7 +47,7 @@ const ResetPassword = () => {
           )}
 
           {isSubmitting ? (
-            '....'
+            '....loading'
           ) : (
             <CustomButton
               containerStyles="justify-center text-slate-300 bg-indigo-700 rounded-lg font-semibold px-3 py-2 pt-1.5 my-3 w-full"

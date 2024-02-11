@@ -3,26 +3,53 @@ import { CustomButton, TextInput } from '../components';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { userLogin } from '../redux/userSlice';
+import { apiRequest } from '../utils';
 
 const Login = () => {
+  const [errMsg, setErrMsg] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const dispatch = useDispatch();
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({ mode: 'onSubmit' });
 
-  const onSubmit = async (data) => {};
-
-  const [errMsg, setErrMsg] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const dispatch = useDispatch();
+  const onSubmit = async (data) => {
+    setIsSubmitting(true);
+    try {
+      const res = await apiRequest({
+        url: '/auth/login',
+        data,
+        method: 'POST',
+      });
+      console.log(res);
+      if (res?.status === 'failed') {
+        setErrMsg(res);
+      } else {
+        setErrMsg(res);
+        const userData = { token: res?.data?.token, ...res?.data?.user };
+        console.log('userData ', userData);
+        dispatch(userLogin(userData));
+        setInterval(() => {
+          window.location.replace('/');
+        }, 500);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="bg-slate-950 w-full min-h-screen flex flex-col items-center justify-center py-14">
       <div className="text-lg font-bold mb-4 text-indigo-300">birb</div>
       <div
         className="text-slate-300
-      bg-black w-10/12 sm:w-4/12 sm:h-4/6 flex flex-col rounded-xl overflow-hidden   p-5 gap-3 pb-10"
+      bg-black w-10/12 sm:w-4/12 sm:h-4/6 flex flex-col rounded-xl overflow-hidden p-5 gap-3 pb-10"
       >
         <div className="text-indigo-300 text-2xl mb-3 font-bold">
           Log in to your account.
@@ -68,7 +95,7 @@ const Login = () => {
             </span>
           )}
           {isSubmitting ? (
-            '....'
+            '....loading'
           ) : (
             <CustomButton
               containerStyles="justify-center text-slate-300 bg-indigo-700 rounded-lg font-semibold px-3 py-2 pt-1.5 my-3 w-full"

@@ -108,7 +108,7 @@ const Home = () => {
                 </label>
 
                 {posting ? (
-                  '....'
+                  '....loading'
                 ) : (
                   <CustomButton
                     title="Post"
@@ -156,13 +156,11 @@ const Home = () => {
                     >
                       <img
                         src={from?.profileUrl ?? NoProfile}
-                        alt={from?.firstName}
+                        alt={from?.name}
                         className="w-10 h-10 object-cover rounded-full"
                       />
                       <div className="flex-1">
-                        <p className="text-base font-medium">
-                          {from?.firstName}
-                        </p>
+                        <p className="text-base font-medium">{from?.name}</p>
                       </div>
                     </Link>
 
@@ -202,13 +200,11 @@ const Home = () => {
                     >
                       <img
                         src={friend?.profileUrl ?? NoProfile}
-                        alt={friend?.firstName}
+                        alt={friend?.name}
                         className="w-10 h-10 object-cover rounded-full"
                       />
                       <div className="flex-1 ">
-                        <p className="text-base font-medium">
-                          {friend?.firstName}
-                        </p>
+                        <p className="text-base font-medium">{friend?.name}</p>
                       </div>
                     </Link>
 

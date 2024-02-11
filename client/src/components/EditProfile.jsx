@@ -4,7 +4,7 @@ import { MdClose } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import TextInput from './TextInput';
 import CustomButton from './CustomButton';
-import { UpdateProfile } from '../redux/userSlice';
+import { updateProfile } from '../redux/userSlice';
 
 const EditProfile = () => {
   const { user } = useSelector((state) => state.user);
@@ -25,7 +25,7 @@ const EditProfile = () => {
   const onSubmit = async (data) => {};
 
   const handleClose = () => {
-    dispatch(UpdateProfile(false));
+    dispatch(updateProfile(false));
   };
   const handleSelect = (e) => {
     setPicture(e.target.files[0]);
@@ -63,26 +63,26 @@ const EditProfile = () => {
               onSubmit={handleSubmit(onSubmit)}
             >
               <TextInput
-                name="firstName"
-                label="First Name"
-                placeholder="First Name"
+                name="name"
+                label="Username"
+                placeholder="Username"
                 type="text"
                 styles="w-full"
-                register={register('firstName', {
-                  required: 'First Name is required!',
+                register={register('name', {
+                  required: 'Username is required!',
                 })}
-                error={errors.firstName ? errors.firstName?.message : ''}
+                error={errors.name ? errors.name?.message : ''}
               />
 
               <TextInput
-                label="Location"
-                placeholder="Location"
+                label="bio"
+                placeholder="bio"
                 type="text"
                 styles="w-full"
-                register={register('location', {
-                  required: 'Location do no match',
+                register={register('bio', {
+                  required: 'bio do no match',
                 })}
-                error={errors.location ? errors.location?.message : ''}
+                error={errors.bio ? errors.bio?.message : ''}
               />
 
               <label
@@ -113,7 +113,7 @@ const EditProfile = () => {
 
               <div className="py-5 sm:flex sm:flex-row-reverse border-t">
                 {isSubmitting ? (
-                  '....'
+                  '....loading'
                 ) : (
                   <CustomButton
                     type="submit"
