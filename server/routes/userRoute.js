@@ -11,6 +11,7 @@ import {
   profileViews,
 } from '../controllers/userController.js';
 import userAuth from '../middlewares/authMiddleware.js';
+import { diskUpload } from '../utils/diskUpload.js';
 
 const router = express.Router();
 const __dirname = path.resolve(path.dirname(''));
@@ -21,7 +22,7 @@ router.get('/verified', (req, res) => {
 });
 
 router.post('/get-user/:id?', userAuth, getUser);
-router.put('/update-user', userAuth, updateUser);
+router.put('/update-user', userAuth, diskUpload.single('image'), updateUser);
 
 router.post('/friend-request', userAuth, friendRequest);
 router.post('/get-friend-request', userAuth, getFriendRequest);

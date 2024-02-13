@@ -4,11 +4,12 @@ import mongoose from 'mongoose';
 import { v2 as cloudinary } from 'cloudinary';
 import fs from 'fs';
 
-export const createPost = async (req, res, next) => {
+export const createPost = async (req, res) => {
   let image = req.file;
   try {
     const { userId } = req.user;
     const { description } = req.body;
+    console.log(req.body);
 
     if (!description) {
       return res
@@ -70,7 +71,7 @@ export const getPosts = async (req, res, next) => {
     const posts = await Posts.find(search ? searchPostQuery : {})
       .populate({
         path: 'userId',
-        select: 'name bio profileUrl -password',
+        select: 'name bio image -password',
       })
       .sort({ _id: -1 })
       .limit(100);

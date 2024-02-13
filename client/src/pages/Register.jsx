@@ -56,7 +56,8 @@ const Register = () => {
               required: 'Name is required',
               pattern: {
                 value: /^[a-zA-Z0-9_.]+$/,
-                message: 'Name should only contain underscores and dots.',
+                message:
+                  'Name should only contain alphanumeric, underscores and dots.',
               },
             })}
             error={errors.name ? errors.name.message : ''}

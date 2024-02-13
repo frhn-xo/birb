@@ -19,7 +19,7 @@ const ProfileCard = ({ user }) => {
         <div className="w-full flex items-center justify-between border-b border-indigo-900 pb-5 ">
           <Link to={'/profile/' + user?._id} className="flex gap-2">
             <img
-              src={user?.profileUrl ?? NoProfile}
+              src={user?.image ?? NoProfile}
               alt={user?.email}
               className="w-10 h-10 object-cover rounded-full"
             />
@@ -47,20 +47,19 @@ const ProfileCard = ({ user }) => {
           </div>
         </div>
 
-        <div className="w-full flex flex-col gap-2 py-4 border-b border-indigo-900">
+        <div
+          className="w-full flex flex-col gap-2 py-4 border-b border-indigo-900"
+          onClick={() => dispatch(updateProfile(true))}
+        >
           <div className="flex gap-2 items-center ">
-            <CiLocationOn className="text-xl " />
-            <span>{user?.bio ?? 'Add Bio'}</span>
-          </div>
-
-          <div className="flex gap-2 items-center ">
-            <BsBriefcase className=" text-lg " />
-            <span>{user?.profession ?? 'Add Profession'}</span>
+            <span>
+              {user?.bio ?? <span className="opacity-50">{'no bio :('}</span>}
+            </span>
           </div>
         </div>
 
-        <div className="w-full flex flex-col gap-2 py-4 ">
-          <p className="text-lg font-semibold">
+        <div className="w-full flex flex-col gap-2 py-4">
+          <p className="text-md font-medium text-center">
             {user?.friends?.length} Friends
           </p>
 

@@ -39,7 +39,6 @@ const EditProfile = () => {
             <div className="absolute inset-0 opacity-70"></div>
           </div>
           <span className="hidden sm:inline-block sm:align-middle sm:h-screen bg-red-300"></span>
-          &#8203;
           <div
             className="inline-block align-bottom rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full bg-black text-slate-300"
             role="dialog"
@@ -69,7 +68,12 @@ const EditProfile = () => {
                 type="text"
                 styles="w-full"
                 register={register('name', {
-                  required: 'Username is required!',
+                  required: 'Name is required!',
+                  pattern: {
+                    value: /^[a-zA-Z0-9_.]+$/,
+                    message:
+                      'Name should only contain alphanumeric, underscores and dots.',
+                  },
                 })}
                 error={errors.name ? errors.name?.message : ''}
               />
@@ -80,7 +84,10 @@ const EditProfile = () => {
                 type="text"
                 styles="w-full"
                 register={register('bio', {
-                  required: 'bio do no match',
+                  maxLength: {
+                    value: 150,
+                    message: 'bio cannot exceed 150 characters',
+                  },
                 })}
                 error={errors.bio ? errors.bio?.message : ''}
               />

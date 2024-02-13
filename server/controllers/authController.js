@@ -40,7 +40,7 @@ export const login = async (req, res) => {
     }
     const user = await Users.findOne({ email })
       .select('+password')
-      .populate({ path: 'friends', select: 'name bio profileUrl -password' });
+      .populate({ path: 'friends', select: 'name bio image -password' });
 
     if (!user) {
       throw new Error('Invalid email or password');

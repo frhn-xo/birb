@@ -25,7 +25,7 @@ const CommentForm = ({ user, id, replyAt, getComments }) => {
     >
       <div className="w-full flex items-center gap-2 py-4 ">
         <img
-          src={user?.profileUrl ?? NoProfile}
+          src={user?.image ?? NoProfile}
           alt="User Image"
           className="w-6 h-6 rounded-full object-cover"
         />
@@ -81,7 +81,7 @@ const PostCard = ({ post, user, deletePost, likePost }) => {
       <div className="flex gap-3 items-center mb-2">
         <Link to={`/profile/${post?.userId?._id}`}>
           <img
-            src={post?.userId?.profileUrl ?? NoProfile}
+            src={post?.userId?.image ?? NoProfile}
             alt=""
             className="w-10 h-10 object-cover rounded-full"
           />
@@ -92,7 +92,7 @@ const PostCard = ({ post, user, deletePost, likePost }) => {
               <p className="font-medium text-md">{post?.userId.name}</p>
             </Link>
           </div>
-          <span className="text-xs text-slate-700">
+          <span className="text-xs opacity-50">
             {moment(post?.createdAt ?? '2023-05-25').fromNow()}
           </span>
         </div>
@@ -171,7 +171,7 @@ const PostCard = ({ post, user, deletePost, likePost }) => {
                 <div className="flex gap-3 items-center mb-1">
                   <Link to={`/profile/${comment?.userId?._id}`}>
                     <img
-                      src={comment?.userId?.profileUrl ?? NoProfile}
+                      src={comment?.userId?.image ?? NoProfile}
                       alt={comment?.user?.name}
                       className="w-6 h-6 rounded-full object-cover"
                     />
@@ -182,7 +182,7 @@ const PostCard = ({ post, user, deletePost, likePost }) => {
                         {comment?.userId.name}
                       </p>
                     </Link>
-                    <span className="text-xs text-slate-700">
+                    <span className="text-xs opacity-50">
                       {moment(post?.createdAt ?? '2023-05-25').fromNow()}
                     </span>
                   </div>
@@ -203,7 +203,7 @@ const PostCard = ({ post, user, deletePost, likePost }) => {
               </div>
             ))
           ) : (
-            <span className="flex text-xs px-14 text-center text-slate-700">
+            <span className="flex text-xs px-14 text-center opacity-50">
               ....Be the first to comment
             </span>
           )}

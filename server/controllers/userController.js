@@ -4,6 +4,8 @@ import Users from '../models/userModel.js';
 import PasswordReset from '../models/passwordResetModel.js';
 import FriendRequest from '../models/friendRequestModel.js';
 import { compareString, createJwt } from '../utils/auth.js';
+import { v2 as cloudinary } from 'cloudinary';
+import fs from 'fs';
 
 export const verifyEmail = async (req, res) => {
   const { userId, token } = req.params;
@@ -130,41 +132,69 @@ export const getUser = async (req, res, next) => {
 };
 
 export const updateUser = async (req, res, next) => {
+  let image = req.file;
   try {
     const { name, bio } = req.body;
+    const { userId } = req.user;
 
-    if (!(name || bio)) {
-      next('Please provide all required fields');
-      return;
+    if (!(name || bio || image)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide all required fields',
+      });
     }
 
-    const { userId } = req.user;
+    let publicId = null;
+
+    const user = await Users.findById(userId);
+
+    if (image) {
+      if (user?.publicId) {
+        await cloudinary.uploader.destroy(user.publicId, (error, result) => {
+          if (error) {
+            console.error('Error deleting image:', error);
+          } else {
+            console.log('Image deleted successfully:', result);
+          }
+        });
+      }
+
+      const uploadedResponse = await cloudinary.uploader.upload(image.path, {
+        folder: 'birb',
+        quality: 'auto',
+      });
+      fs.unlinkSync(`uploads/${image.filename}`);
+      image = uploadedResponse.secure_url;
+      publicId = uploadedResponse.public_id;
+    }
 
     const updateUser = {
       name: name?.trim(),
       bio: bio?.trim(),
       _id: userId,
+      image,
+      publicId,
     };
 
-    const user = await Users.findByIdAndUpdate(userId, updateUser, {
+    const updatedUser = await Users.findByIdAndUpdate(userId, updateUser, {
       new: true,
     });
 
-    await user.populate({ path: 'friends', select: '-password' });
+    await updatedUser.populate({ path: 'friends', select: '-password' });
 
-    const token = createJwt(user?._id);
+    const token = createJwt(updatedUser?._id);
 
-    user.password = undefined;
+    updatedUser.password = undefined;
 
     res.status(200).json({
-      sucess: true,
+      success: true,
       message: 'User updated successfully',
-      user,
+      user: updatedUser,
       token,
     });
   } catch (error) {
-    console.log(error);
-    res.status(404).json({ message: error.message });
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 };
 
@@ -233,7 +263,7 @@ export const getFriendRequest = async (req, res) => {
     })
       .populate({
         path: 'requestFrom',
-        select: 'name profileUrl bio -password',
+        select: 'name image bio -password',
       })
       .limit(10)
       .sort({
@@ -334,7 +364,7 @@ export const suggestedFriends = async (req, res) => {
 
     let queryResult = Users.find(queryObject)
       .limit(15)
-      .select('name bio profileUrl -password');
+      .select('name bio image -password');
 
     const suggestedFriends = await queryResult;
 
