@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { addPost } from '../redux/postSlice';
 import {
   TopBar,
   ProfileCard,
@@ -21,6 +22,7 @@ const Home = ({ searchData, showSearch, setSearchData, setShowSearch }) => {
   const [errMsg, setErrMsg] = useState('');
   const [file, setFile] = useState(null);
   const [posting, setPosting] = useState(false);
+  const dispatch = useDispatch();
 
   const {
     register,
@@ -63,6 +65,9 @@ const Home = ({ searchData, showSearch, setSearchData, setShowSearch }) => {
           setErrMsg('');
         }, 700);
         reset();
+        console.log(response.data.data);
+        response.data.data.userId = user;
+        dispatch(addPost(response.data.data));
       }
     } catch (error) {
       setErrMsg(error.message);
