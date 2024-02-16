@@ -38,9 +38,10 @@ export const login = async (req, res) => {
     if (!email || !password) {
       throw new Error('Provide User Credentials');
     }
-    const user = await Users.findOne({ email })
-      .select('+password')
-      .populate({ path: 'friends', select: 'name bio image -password' });
+    const user = await Users.findOne({ email }).select('+password').populate({
+      path: 'friends inRequest outRequest',
+      select: 'name image -password',
+    });
 
     if (!user) {
       throw new Error('Invalid email or password');

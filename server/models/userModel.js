@@ -26,6 +26,8 @@ const userSchema = new mongoose.Schema(
     friends: [{ type: Schema.Types.ObjectId, ref: 'Users' }],
     views: [{ type: String }],
     verified: { type: Boolean, default: false },
+    inRequest: [{ type: Schema.Types.ObjectId, ref: 'Users' }],
+    outRequest: [{ type: Schema.Types.ObjectId, ref: 'Users' }],
   },
   { timestamps: true }
 );

@@ -2,7 +2,11 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { LiaEditSolid } from 'react-icons/lia';
-import { BsPersonFillAdd } from 'react-icons/bs';
+import { IoSparklesSharp } from 'react-icons/io5';
+import { LuTimer } from 'react-icons/lu';
+import { IoPersonAdd } from 'react-icons/io5';
+import { MdOutlineCancel } from 'react-icons/md';
+import { IoMdAddCircle } from 'react-icons/io';
 import moment from 'moment';
 
 import { NoProfile } from '../assets';
@@ -33,25 +37,45 @@ const ProfileCard = ({ user }) => {
 
           <div className="">
             {user?._id === data?._id ? (
-              <LiaEditSolid
-                size={30}
-                className=" text-indigo-300 hover:bg-indigo-700 cursor-pointer h-8 w-8 p-1 rounded-lg"
-                onClick={() => dispatch(updateProfile(true))}
-              />
+              <div className=" text-indigo-300 hover:bg-indigo-700 cursor-pointer rounded-lg p-1 px-2 mr-3">
+                <LiaEditSolid
+                  size={26}
+                  onClick={() => dispatch(updateProfile(true))}
+                />
+              </div>
+            ) : user?.friends?.some((friend) => friend._id === data?._id) ? (
+              <div className=" text-indigo-300 hover:bg-indigo-700 cursor-pointer rounded-lg p-1 px-2 mr-3">
+                <IoSparklesSharp size={26} onClick={() => {}} />
+              </div>
+            ) : user?.inRequest?.some(
+                (request) => request._id === data?._id
+              ) ? (
+              <div className="flex  mr-3">
+                <div className=" text-indigo-300 hover:bg-indigo-700 cursor-pointer rounded-lg p-1 px-2">
+                  <IoMdAddCircle size={26} onClick={() => {}} />
+                </div>
+                <div className=" text-indigo-300 hover:bg-indigo-700 cursor-pointer rounded-lg p-1 px-2">
+                  <MdOutlineCancel size={26} onClick={() => {}} />
+                </div>
+              </div>
+            ) : user?.outRequest?.some(
+                (request) => request._id === data?._id
+              ) ? (
+              <div className=" text-indigo-300 cursor-pointer rounded-lg p-1 px-2 mr-3 flex gap-1">
+                <span className="md:hidden text-xs font-semibold pt-1.5">
+                  request sent
+                </span>
+                <LuTimer size={26} />
+              </div>
             ) : (
-              <BsPersonFillAdd
-                size={20}
-                className=" text-indigo-300 hover:bg-indigo-700 cursor-pointer h-8 w-8 p-1 rounded-lg"
-                onClick={() => {}}
-              />
+              <div className=" text-indigo-300 hover:bg-indigo-700 cursor-pointer rounded-lg p-1 px-2 mr-3">
+                <IoPersonAdd size={26} onClick={() => {}} />
+              </div>
             )}
           </div>
         </div>
 
-        <div
-          className="w-full flex flex-col gap-2 py-4 border-b border-indigo-900"
-          onClick={() => dispatch(updateProfile(true))}
-        >
+        <div className="w-full flex flex-col gap-2 py-4 border-b border-indigo-900">
           <div className="flex gap-2 items-center ">
             <span>
               {user?._id === data?._id

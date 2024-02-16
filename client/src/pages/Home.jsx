@@ -82,20 +82,19 @@ const Home = ({ searchData, showSearch, setSearchData, setShowSearch }) => {
         }}
       >
         <TopBar setSearchData={setSearchData} setShowSearch={setShowSearch} />
-        <div className="w-full flex gap-2 lg:gap-4 pb-10 h-full">
+        <div className="w-full flex gap-2 lg:gap-4 pb-4 h-full">
           {/* left */}
-          <div className="hidden w-1/3 lg:w-1/4 h-full md:flex flex-col gap-6 overflow-y-auto ">
+          <div className="hidden w-1/3 lg:w-1/4 h-full md:flex flex-col md:gap-6 overflow-y-auto ">
             <ProfileCard user={user} />
             <FriendsCard friends={user?.friends} />
           </div>
           {/* center */}
-          <div></div>
           {showSearch ? (
-            <div className="flex-1 h-full bg-black flex flex-col gap-6 overflow-y-auto rounded-xl">
+            <div className="flex-1 h-full bg-black flex flex-col md:gap-6 overflow-y-auto rounded-xl">
               <UserList data={searchData} />
             </div>
           ) : (
-            <div className="flex-1 h-full bg-black flex flex-col gap-6 overflow-y-auto rounded-xl">
+            <div className="flex-1 h-full bg-black flex flex-col md:gap-6 overflow-y-auto rounded-xl">
               <form
                 className="bg-black px-4 rounded-xl"
                 onSubmit={handleSubmit(handlePostSubmit)}

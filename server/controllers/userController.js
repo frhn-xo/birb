@@ -104,8 +104,8 @@ export const getUser = async (req, res, next) => {
     const { id } = req.params;
 
     const user = await Users.findById(id ?? userId).populate({
-      path: 'friends',
-      select: '-password',
+      path: 'friends inRequest outRequest',
+      select: 'name image -password',
     });
 
     if (!user) {
@@ -206,7 +206,10 @@ export const updateUser = async (req, res, next) => {
       new: true,
     });
 
-    await updatedUser.populate({ path: 'friends', select: '-password' });
+    await updatedUser.populate({
+      path: 'friends inRequest outRequest',
+      select: 'name image -password',
+    });
 
     const token = createJwt(updatedUser?._id);
 
@@ -264,6 +267,18 @@ export const friendRequest = async (req, res, next) => {
       requestFrom: userId,
     });
 
+    await Users.findByIdAndUpdate(
+      userId,
+      { $addToSet: { outRequest: requestTo } },
+      { new: true }
+    );
+
+    await Users.findByIdAndUpdate(
+      requestTo,
+      { $addToSet: { inRequest: userId } },
+      { new: true }
+    );
+
     res.status(201).json({
       success: true,
       message: 'Friend Request sent successfully',
@@ -311,7 +326,7 @@ export const getFriendRequest = async (req, res) => {
 
 export const acceptRequest = async (req, res, next) => {
   try {
-    const id = req.user.userId;
+    const userId = req.user.userId;
 
     const { rid, status } = req.body;
 
@@ -324,18 +339,38 @@ export const acceptRequest = async (req, res, next) => {
 
     const newRes = await FriendRequest.findByIdAndDelete({ _id: rid });
 
+    const requestFrom = newRes.requestFrom._id;
+
     if (status === 'Accepted') {
-      const user = await Users.findById(id);
+      await Users.findByIdAndUpdate(
+        userId,
+        {
+          $addToSet: { friends: requestFrom },
+          $pull: { inRequest: requestFrom, outRequest: requestFrom },
+        },
+        { new: true }
+      );
 
-      user.friends.push(newRes?.requestFrom);
+      await Users.findByIdAndUpdate(
+        requestFrom,
+        {
+          $addToSet: { friends: userId },
+          $pull: { inRequest: userId, outRequest: userId },
+        },
+        { new: true }
+      );
+    } else if (status === 'Rejected') {
+      await Users.findByIdAndUpdate(
+        userId,
+        { $pull: { inRequest: rid, outRequest: rid } },
+        { new: true }
+      );
 
-      await user.save();
-
-      const friend = await Users.findById(newRes?.requestFrom);
-
-      friend.friends.push(newRes?.requestTo);
-
-      await friend.save();
+      await Users.findByIdAndUpdate(
+        rid,
+        { $pull: { inRequest: userId, outRequest: userId } },
+        { new: true }
+      );
     }
 
     res.status(201).json({
