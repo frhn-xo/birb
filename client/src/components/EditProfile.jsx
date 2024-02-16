@@ -4,14 +4,15 @@ import { MdClose } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import TextInput from './TextInput';
 import CustomButton from './CustomButton';
-import { updateProfile } from '../redux/userSlice';
+import { updateProfile, userLogin } from '../redux/userSlice';
+import { apiRequest } from '../utils';
 
 const EditProfile = () => {
   const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const [errMsg, setErrMsg] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [picture, setPicture] = useState(null);
+  const [posting, setPosting] = useState(false);
+  const [file, setFile] = useState(null);
 
   const {
     register,
@@ -22,13 +23,60 @@ const EditProfile = () => {
     defaultValues: { ...user },
   });
 
-  const onSubmit = async (data) => {};
+  const handleEditSubmit = async (data) => {
+    try {
+      console.log(data.name, data.bio);
+      setPosting(true);
+
+      const formData = new FormData();
+      formData.append('name', data.name);
+
+      if (data.bio.trim()) {
+        formData.append('bio', data.bio);
+      }
+
+      if (file) {
+        if (file.size <= 5 * 1024 * 1024) {
+          formData.append('image', file);
+        } else {
+          throw new Error(`File size shouldn't be more than 5MB, brrrr...`);
+        }
+      }
+
+      console.log(formData, ' - formdata');
+
+      const res = await apiRequest({
+        url: '/users/update-user',
+        method: 'put',
+        data: formData,
+        token: user.token,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (res.status === 'failed') {
+        setErrMsg(res.message || 'Unknown error occurred');
+      } else {
+        setErrMsg(res);
+        const userData = {
+          token: res?.data?.token,
+          ...res?.data?.user,
+        };
+        console.log('userData ', userData);
+        dispatch(userLogin(userData));
+      }
+    } catch (error) {
+      setErrMsg(error.message);
+      console.error(error);
+    } finally {
+      setPosting(false);
+      setFile(null);
+    }
+  };
 
   const handleClose = () => {
     dispatch(updateProfile(false));
-  };
-  const handleSelect = (e) => {
-    setPicture(e.target.files[0]);
   };
 
   return (
@@ -59,12 +107,12 @@ const EditProfile = () => {
             </div>
             <form
               className="px-4 sm:px-6 flex flex-col gap-3 2xl:gap-6"
-              onSubmit={handleSubmit(onSubmit)}
+              onSubmit={handleSubmit(handleEditSubmit)}
             >
               <TextInput
                 name="name"
-                label="Username"
-                placeholder="Username"
+                label="Name"
+                placeholder="name"
                 type="text"
                 styles="w-full"
                 register={register('name', {
@@ -99,8 +147,8 @@ const EditProfile = () => {
                 <p className="font-semibold mb-2">Profile Pic </p>
                 <input
                   type="file"
+                  onChange={(e) => setFile(e.target.files[0])}
                   id="imgUpload"
-                  onChange={(e) => handleSelect(e)}
                   accept=".jpg, .png, .jpeg"
                 />
               </label>
@@ -119,7 +167,7 @@ const EditProfile = () => {
               )}
 
               <div className="py-5 sm:flex sm:flex-row-reverse border-t">
-                {isSubmitting ? (
+                {posting ? (
                   '....loading'
                 ) : (
                   <CustomButton

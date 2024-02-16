@@ -7,6 +7,8 @@ import {
   CustomButton,
   TextInput,
   EditProfile,
+  FeedContainer,
+  UserList,
 } from '../components';
 import { NoProfile } from '../assets';
 import { apiRequest } from '../utils';
@@ -18,6 +20,8 @@ const Home = () => {
   const [errMsg, setErrMsg] = useState('');
   const [file, setFile] = useState(null);
   const [posting, setPosting] = useState(false);
+  const [searchData, setSearchData] = useState('');
+  const [showSearch, setShowSearch] = useState(false);
   const {
     register,
     handleSubmit,
@@ -72,7 +76,7 @@ const Home = () => {
   return (
     <>
       <div className="bg-slate-950 w-full min-h-screen text-slate-300 px-0 lg:px-10 2xl:px-40">
-        <TopBar />
+        <TopBar setSearchData={setSearchData} />
         <div className="w-full flex gap-2 lg:gap-4 pb-10 h-full">
           {/* left */}
           <div className="hidden w-1/3 lg:w-1/4 h-full md:flex flex-col gap-6 overflow-y-auto ">
@@ -80,6 +84,7 @@ const Home = () => {
             <FriendsCard friends={user?.friends} />
           </div>
           {/* center */}
+          {/* <UserList data={searchData} /> */}
           <div className="flex-1 h-full bg-black flex flex-col gap-6 overflow-y-auto rounded-xl">
             <form
               className="bg-black px-4 rounded-xl"
@@ -138,6 +143,7 @@ const Home = () => {
                 )}
               </div>
             </form>
+            <FeedContainer />
           </div>
         </div>
       </div>

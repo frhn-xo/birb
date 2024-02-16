@@ -51,30 +51,21 @@ export const createPost = async (req, res) => {
   }
 };
 
-export const getPosts = async (req, res, next) => {
+export const getPosts = async (req, res) => {
   try {
     const { userId } = req.user;
-    const { search } = req.body;
 
     const user = await Users.findById(userId);
     const friends = user?.friends?.toString().split(',') ?? [];
     friends.push(userId);
 
-    const searchPostQuery = {
-      $or: [
-        {
-          description: { $regex: search, $options: 'i' },
-        },
-      ],
-    };
-
-    const posts = await Posts.find(search ? searchPostQuery : {})
+    const posts = await Posts.find()
       .populate({
         path: 'userId',
         select: 'name bio image -password',
       })
       .sort({ _id: -1 })
-      .limit(100);
+      .limit(300);
 
     const friendsPosts = [];
     const otherPosts = [];
@@ -82,7 +73,7 @@ export const getPosts = async (req, res, next) => {
     posts?.forEach((post) => {
       const postUserId = post?.userId?._id.toString();
 
-      if (friends.includes(postUserId)) {
+      if (postUserId != userId || friends.includes(postUserId)) {
         friendsPosts.push(post);
       } else {
         otherPosts.push(post);
@@ -107,9 +98,10 @@ export const getUserPosts = async (req, res, next) => {
     const post = await Posts.find({ userId: id })
       .populate({
         path: 'userId',
-        select: 'name bio -password',
+        select: 'name bio image -password',
       })
-      .sort({ _id: -1 });
+      .sort({ _id: -1 })
+      .limit(300);
 
     res.status(200).json({
       sucess: true,

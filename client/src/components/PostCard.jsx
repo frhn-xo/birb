@@ -23,7 +23,7 @@ const CommentForm = ({ user, id, replyAt, getComments }) => {
       onSubmit={handleSubmit(onSubmit)}
       className="w-full border-indigo-950 text-slate-300 "
     >
-      <div className="w-full flex items-center gap-2 py-4 ">
+      <div className="w-full flex items-center gap-2 py-4 px-2">
         <img
           src={user?.image ?? NoProfile}
           alt="User Image"
@@ -77,13 +77,16 @@ const PostCard = ({ post, user, deletePost, likePost }) => {
   };
 
   return (
-    <div className="mb-1 bg-black px-4 ">
+    <div
+      className="bg-black px-4
+    pb-5 pt-3"
+    >
       <div className="flex gap-3 items-center mb-2">
         <Link to={`/profile/${post?.userId?._id}`}>
           <img
             src={post?.userId?.image ?? NoProfile}
             alt=""
-            className="w-10 h-10 object-cover rounded-full"
+            className="w-10 h-10 object-cover rounded-full m-1"
           />
         </Link>
         <div className="w-full flex justify-between">
@@ -124,7 +127,7 @@ const PostCard = ({ post, user, deletePost, likePost }) => {
           <img
             src={post?.image}
             alt="post image"
-            className=" w-full my-3 rounded-lg"
+            className=" w-full max-h-96 sm:max-h-full object-cover my-3 rounded-lg"
           />
         )}
       </div>

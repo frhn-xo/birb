@@ -1,18 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { FriendsCard, PostCard, ProfileCard, TopBar } from '../components';
-import { posts } from '../assets/data';
+import {
+  FeedContainer,
+  FriendsCard,
+  ProfileCard,
+  TopBar,
+  EditProfile,
+} from '../components';
+import { apiRequest } from '../utils';
 
 const Profile = () => {
+  const { user, edit } = useSelector((state) => state.user);
   const { id } = useParams();
-  const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.user);
   const [userInfo, setUserInfo] = useState(user);
-  const [loading, setLoading] = useState(false);
 
-  const handleDelete = () => {};
-  const handleLikePost = () => {};
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await apiRequest({
+          url: `/users/get-user/${id}`,
+          method: 'get',
+          token: user.token,
+        });
+
+        if (response.status === 'failed') {
+          console.log(response.message);
+        } else {
+          setUserInfo(response.data.user);
+          // console.log('profilejsx ka ', response, response.data.name);
+          // console.log(userInfo);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchUser();
+  }, [id]);
 
   return (
     <>
@@ -21,7 +45,7 @@ const Profile = () => {
         <div className="w-full flex gap-2 lg:gap-4 pb-10 h-full">
           {/* LEFT */}
           <div className="hidden w-1/3 lg:w-1/4 md:flex flex-col gap-6 overflow-y-auto">
-            <ProfileCard user={user} />
+            <ProfileCard user={userInfo} />
           </div>
 
           {/* CENTER */}
@@ -29,27 +53,7 @@ const Profile = () => {
             <div className="visible md:hidden">
               <ProfileCard user={userInfo} />
             </div>
-            {loading ? (
-              <p className="text-amber-500 text-sm px-5">
-                {'....hold on, loading em posts'}
-              </p>
-            ) : posts?.length > 0 ? (
-              posts?.map((post) => (
-                <PostCard
-                  post={post}
-                  key={post?._id}
-                  user={user}
-                  deletePost={handleDelete}
-                  likePost={handleLikePost}
-                />
-              ))
-            ) : (
-              <div className="flex w-full h-full items-center justify-center">
-                <p className="text-amber-500 text-sm px-5">
-                  {'....No posts available'}
-                </p>
-              </div>
-            )}
+            <FeedContainer userInfoId={userInfo._id} />
           </div>
 
           {/* RIGHT */}
@@ -58,6 +62,8 @@ const Profile = () => {
           </div>
         </div>
       </div>
+
+      {edit && <EditProfile />}
     </>
   );
 };

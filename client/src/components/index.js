@@ -5,6 +5,8 @@ import ProfileCard from './ProfileCard';
 import FriendsCard from './FriendsCard';
 import PostCard from './PostCard';
 import EditProfile from './EditProfile';
+import FeedContainer from './FeedContainer';
+import UserList from './UserList';
 
 export {
   TextInput,
@@ -14,4 +16,6 @@ export {
   FriendsCard,
   PostCard,
   EditProfile,
+  FeedContainer,
+  UserList,
 };

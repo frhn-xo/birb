@@ -9,6 +9,7 @@ import {
   acceptRequest,
   suggestedFriends,
   profileViews,
+  search,
 } from '../controllers/userController.js';
 import userAuth from '../middlewares/authMiddleware.js';
 import { diskUpload } from '../utils/diskUpload.js';
@@ -21,8 +22,10 @@ router.get('/verified', (req, res) => {
   res.sendFile(path.join(__dirname, './views/verifiedpage.html'));
 });
 
-router.post('/get-user/:id?', userAuth, getUser);
+router.get('/get-user/:id?', userAuth, getUser);
 router.put('/update-user', userAuth, diskUpload.single('image'), updateUser);
+
+router.get('/search', userAuth, search);
 
 router.post('/friend-request', userAuth, friendRequest);
 router.post('/get-friend-request', userAuth, getFriendRequest);

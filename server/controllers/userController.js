@@ -131,6 +131,32 @@ export const getUser = async (req, res, next) => {
   }
 };
 
+export const search = async (req, res) => {
+  try {
+    const { name } = req.query;
+
+    if (!name) {
+      return res.status(400).json({ message: 'Username is empty' });
+    }
+
+    const queryObject = { name: { $regex: name, $options: 'i' } };
+
+    const queryResult = Users.find(queryObject)
+      .limit(300)
+      .select('name bio image -password');
+
+    const searchFriends = await queryResult;
+
+    res.status(200).json({
+      success: true,
+      data: searchFriends,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({ message: error.message });
+  }
+};
+
 export const updateUser = async (req, res, next) => {
   let image = req.file;
   try {
@@ -185,7 +211,6 @@ export const updateUser = async (req, res, next) => {
     const token = createJwt(updatedUser?._id);
 
     updatedUser.password = undefined;
-
     res.status(200).json({
       success: true,
       message: 'User updated successfully',
