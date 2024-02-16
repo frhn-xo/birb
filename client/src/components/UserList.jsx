@@ -1,73 +1,44 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MdClose } from 'react-icons/md';
+import { BsPersonFillAdd } from 'react-icons/bs';
 
 const UserList = ({ data }) => {
   const handleClose = () => {};
   console.log(data);
   return (
     <>
-      <div className="bg-black h-min w-full">
-        {data.length > 0 ? (
-          data.map((user) => (
-            <div key={user._id}>
-              <div
-                className="bg-black px-5
-    pb-5 pt-3"
-              >
-                <div className="flex gap-3 items-center mb-2">
-                  <Link to={`/profile/${user?._id}`}>
-                    <img
-                      src={user?.image ?? NoProfile}
-                      alt=""
-                      className="w-10 h-10 object-cover rounded-full"
-                    />
-                  </Link>
-                  <div className="w-full flex justify-between">
-                    <div className="">
-                      <Link to={`/profile/${user?._id}`}>
-                        <p className="font-medium text-md">{user?.name}</p>
-                      </Link>
-                    </div>
+      <div className="w-full bg-black shadow-sm rounded-2xl px-5 py-5 text-slate-300">
+        <div className="flex items-center justify-between text-sm font-semibold pb-2 border-b border-indigo-900">
+          <span>users</span>
+        </div>
+
+        <div className="w-full flex flex-col gap-4 pt-4">
+          {data ? (
+            data.map((user) => (
+              <>
+                <Link
+                  to={'/profile/' + user?._id}
+                  key={user?._id}
+                  className="w-full flex gap-4 items-center cursor-pointer"
+                >
+                  <img
+                    src={user?.image ?? NoProfile}
+                    alt={user?.name}
+                    className="w-10 h-10 object-cover rounded-full"
+                  />
+                  <div className="flex-1">
+                    <p className="text-base font-medium">{user?.name}</p>
                   </div>
-                </div>
-                <div className="mx-3">{user?.bio}</div>
-                {/* <div className="mt-4 flex justify-end gap-4 items-center px-3 py-2">
-            <p className="flex gap-2 cursor-pointer">
-              {post?.likes?.includes(user?._id) ? (
-                <BiSolidHeart size={24} className="text-fuchsia-500" />
-              ) : (
-                <BiHeart size={24} />
-              )}
-              {post?.likes?.length}
+                </Link>
+              </>
+            ))
+          ) : (
+            <p className="text-amber-500 text-sm px-5">
+              {'....No posts available'}
             </p>
-            <p
-              className="flex gap-2 cursor-pointer"
-              onClick={() => {
-                setShowComments(showComments === post._id ? null : post._id);
-                getComments(post?.id);
-              }}
-            >
-              <BiComment size={24} />
-              {post?.comments?.length}
-            </p>
-            {user?._id === user?._id && (
-              <div
-                className="flex gap-1 items-center text-base "
-                onClick={() => deletePost(post?._id)}
-              >
-                <MdOutlineDelete size={24} />
-              </div>
-            )}
-          </div> */}
-              </div>
-            </div>
-          ))
-        ) : (
-          <p className="text-amber-500 text-sm px-5">
-            {'....No users available'}
-          </p>
-        )}
+          )}
+        </div>
       </div>
     </>
   );

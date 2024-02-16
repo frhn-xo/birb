@@ -7,10 +7,11 @@ import {
   ProfileCard,
   TopBar,
   EditProfile,
+  UserList,
 } from '../components';
 import { apiRequest } from '../utils';
 
-const Profile = () => {
+const Profile = ({ searchData, showSearch, setSearchData, setShowSearch }) => {
   const { user, edit } = useSelector((state) => state.user);
   const { id } = useParams();
   const [userInfo, setUserInfo] = useState(user);
@@ -28,8 +29,6 @@ const Profile = () => {
           console.log(response.message);
         } else {
           setUserInfo(response.data.user);
-          // console.log('profilejsx ka ', response, response.data.name);
-          // console.log(userInfo);
         }
       } catch (error) {
         console.error(error);
@@ -40,8 +39,13 @@ const Profile = () => {
 
   return (
     <>
-      <div className="bg-slate-950 w-full min-h-screen text-slate-300 px-0 lg:px-10 2xl:px-40">
-        <TopBar />
+      <div
+        className="bg-slate-950 w-full min-h-screen text-slate-300 px-0 lg:px-10 2xl:px-40"
+        onClick={() => {
+          setShowSearch(false);
+        }}
+      >
+        <TopBar setSearchData={setSearchData} setShowSearch={setShowSearch} />
         <div className="w-full flex gap-2 lg:gap-4 pb-10 h-full">
           {/* LEFT */}
           <div className="hidden w-1/3 lg:w-1/4 md:flex flex-col gap-6 overflow-y-auto">
@@ -49,12 +53,16 @@ const Profile = () => {
           </div>
 
           {/* CENTER */}
-          <div className="flex-1 h-full bg-black flex flex-col gap-6 overflow-y-auto rounded-xl">
-            <div className="visible md:hidden">
-              <ProfileCard user={userInfo} />
+          {showSearch ? (
+            <UserList data={searchData} />
+          ) : (
+            <div className="flex-1 h-full bg-black flex flex-col gap-6 overflow-y-auto rounded-xl">
+              <div className="visible md:hidden">
+                <ProfileCard user={userInfo} />
+              </div>
+              <FeedContainer userInfoId={userInfo._id} />
             </div>
-            <FeedContainer userInfoId={userInfo._id} />
-          </div>
+          )}
 
           {/* RIGHT */}
           <div className="hidden w-1/3 lg:w-1/4 h-full md:flex flex-col gap-6 overflow-y-auto ">

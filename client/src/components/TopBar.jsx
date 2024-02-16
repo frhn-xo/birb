@@ -10,7 +10,7 @@ import { apiRequest } from '../utils';
 import { IoSearch } from 'react-icons/io5';
 import { MdLogout } from 'react-icons/md';
 
-const TopBar = ({ setSearchData }) => {
+const TopBar = ({ setSearchData, setShowSearch }) => {
   const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
@@ -38,9 +38,13 @@ const TopBar = ({ setSearchData }) => {
       if (response.status !== 'failed') {
         console.log(response.data.data);
         setSearchData(response.data.data);
+        setShowSearch(true);
+      } else {
+        setShowSearch(false);
       }
     } catch (error) {
       console.error(error);
+      setShowSearch(false);
     }
   };
 

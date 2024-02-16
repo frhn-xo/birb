@@ -21,7 +21,7 @@ const ProfileCard = ({ user }) => {
                 user?._id === data?._id ? data?.image : user?.image ?? NoProfile
               }
               alt={user?.email}
-              className="w-10 h-10 object-cover rounded-full"
+              className="w-14 h-14 object-cover rounded-full mr-1"
             />
 
             <div className="flex flex-col justify-center">
