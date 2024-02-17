@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 import Verification from '../models/emailVerficationModel.js';
 import Users from '../models/userModel.js';
 import PasswordReset from '../models/passwordResetModel.js';
-import FriendRequest from '../models/friendRequestModel.js';
 import { compareString, createJwt } from '../utils/auth.js';
 import { v2 as cloudinary } from 'cloudinary';
 import fs from 'fs';
@@ -229,67 +228,53 @@ export const updateUser = async (req, res, next) => {
 export const friendRequest = async (req, res, next) => {
   try {
     const { userId } = req.user;
-
     const { requestTo } = req.body;
 
-    const requestExist = await FriendRequest.findOne({
-      requestFrom: userId,
-      requestTo,
-    });
-
-    if (requestExist) {
-      next('Friend Request already sent.');
-      return;
+    const requestedUser = await Users.findById(requestTo);
+    if (!requestedUser) {
+      return res
+        .status(404)
+        .json({ message: 'Requested user not found', success: false });
     }
 
-    const oppositeRequestExist = await FriendRequest.findOne({
-      requestFrom: requestTo,
-      requestTo: userId,
-    });
-
-    if (oppositeRequestExist) {
-      next('Friend Request already exists.');
-      return;
+    if (userId == requestedUser._id) {
+      return res.status(400).json({
+        message: 'Cannot send friend request to oneself',
+        success: false,
+      });
     }
 
-    const areAlreadyFriends = await Users.findOne({
-      _id: userId,
-      friends: requestTo,
-    });
-
-    if (areAlreadyFriends) {
-      next('Users are already friends.');
-      return;
+    if (requestedUser.inRequest.includes(userId)) {
+      return res
+        .status(400)
+        .json({ message: 'Friend request already sent', success: false });
     }
 
-    const newRes = await FriendRequest.create({
-      requestTo,
-      requestFrom: userId,
-    });
+    if (requestedUser.friends.includes(userId)) {
+      return res
+        .status(400)
+        .json({ message: 'Users are already friends', success: false });
+    }
 
-    await Users.findByIdAndUpdate(
-      userId,
-      { $addToSet: { outRequest: requestTo } },
-      { new: true }
-    );
+    if (requestedUser.outRequest.includes(userId)) {
+      return res
+        .status(400)
+        .json({ message: 'Friend request already received', success: false });
+    }
 
-    await Users.findByIdAndUpdate(
-      requestTo,
-      { $addToSet: { inRequest: userId } },
-      { new: true }
-    );
+    requestedUser.inRequest.push(userId);
+    await requestedUser.save();
 
-    res.status(201).json({
-      success: true,
-      message: 'Friend Request sent successfully',
-    });
+    const currentUser = await Users.findById(userId);
+    currentUser.outRequest.push(requestTo);
+    await currentUser.save();
+
+    res
+      .status(200)
+      .json({ message: 'Friend request sent successfully', success: true });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      message: 'auth error',
-      success: false,
-      error: error.message,
-    });
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error', success: false });
   }
 };
 
@@ -297,93 +282,80 @@ export const getFriendRequest = async (req, res) => {
   try {
     const { userId } = req.user;
 
-    const request = await FriendRequest.find({
-      requestTo: userId,
-      requestStatus: 'Pending',
-    })
-      .populate({
-        path: 'requestFrom',
-        select: 'name image bio -password',
-      })
-      .limit(10)
-      .sort({
-        _id: -1,
-      });
+    const currentUser = await Users.findById(userId);
 
-    res.status(200).json({
-      success: true,
-      data: request,
-    });
+    if (!currentUser) {
+      return res
+        .status(404)
+        .json({ message: 'User not found', success: false });
+    }
+
+    const inRequestDetails = await Users.find({
+      _id: { $in: currentUser.inRequest },
+    })
+      .select('-password name image')
+      .exec();
+
+    res.status(200).json({ inRequest: inRequestDetails, status: true });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      message: 'auth error',
-      success: false,
-      error: error.message,
-    });
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error', success: false });
   }
 };
 
 export const acceptRequest = async (req, res, next) => {
   try {
     const userId = req.user.userId;
+    const { requestBy, status } = req.body;
 
-    const { rid, status } = req.body;
-
-    const requestExist = await FriendRequest.findById(rid);
-
-    if (!requestExist) {
-      next('No Friend Request Found.');
-      return;
+    const requestingUser = await Users.findById(requestBy);
+    if (!requestingUser) {
+      return res
+        .status(404)
+        .json({ message: 'Requesting user not found', success: false });
     }
 
-    const newRes = await FriendRequest.findByIdAndDelete({ _id: rid });
+    if (!['Accepted', 'Rejected'].includes(status)) {
+      return res.status(400).json({
+        message: 'Invalid status. Status can be "Accepted" or "Rejected"',
+        success: false,
+      });
+    }
 
-    const requestFrom = newRes.requestFrom._id;
+    if (!requestingUser.outRequest.includes(userId)) {
+      return res
+        .status(400)
+        .json({ message: 'Friend request not found', success: false });
+    }
+
+    const currentUser = await Users.findById(userId);
+
+    const index = currentUser.inRequest.indexOf(requestBy);
+    if (index !== -1) {
+      currentUser.inRequest.splice(index, 1);
+    }
+
+    const indexOutRequest = requestingUser.outRequest.indexOf(userId);
+
+    if (indexOutRequest !== -1) {
+      requestingUser.outRequest.splice(indexOutRequest, 1);
+    }
 
     if (status === 'Accepted') {
-      await Users.findByIdAndUpdate(
-        userId,
-        {
-          $addToSet: { friends: requestFrom },
-          $pull: { inRequest: requestFrom, outRequest: requestFrom },
-        },
-        { new: true }
-      );
-
-      await Users.findByIdAndUpdate(
-        requestFrom,
-        {
-          $addToSet: { friends: userId },
-          $pull: { inRequest: userId, outRequest: userId },
-        },
-        { new: true }
-      );
-    } else if (status === 'Rejected') {
-      await Users.findByIdAndUpdate(
-        userId,
-        { $pull: { inRequest: rid, outRequest: rid } },
-        { new: true }
-      );
-
-      await Users.findByIdAndUpdate(
-        rid,
-        { $pull: { inRequest: userId, outRequest: userId } },
-        { new: true }
-      );
+      currentUser.friends.push(requestBy);
+      requestingUser.friends.push(userId);
     }
 
-    res.status(201).json({
+    await currentUser.save();
+    await requestingUser.save();
+
+    res.status(200).json({
+      message: `Friend request ${status.toLowerCase()} successfully`,
       success: true,
-      message: 'Friend Request ' + status,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      message: 'auth error',
-      success: false,
-      error: error.message,
-    });
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error', success: false });
   }
 };
 

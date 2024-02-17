@@ -101,8 +101,11 @@ const EditProfile = () => {
                 Edit Profile
               </label>
 
-              <button className="text-ascent-1" onClick={handleClose}>
-                <MdClose size={22} />
+              <button
+                className="text-ascent-1 text-indigo-300 hover:text-slate-300 mb-2"
+                onClick={handleClose}
+              >
+                <MdClose size={25} />
               </button>
             </div>
             <form

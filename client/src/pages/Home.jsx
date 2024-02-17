@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { addPost } from '../redux/postSlice';
+import { userLogin } from '../redux/userSlice';
 import {
   TopBar,
   ProfileCard,
@@ -23,6 +24,28 @@ const Home = ({ searchData, showSearch, setSearchData, setShowSearch }) => {
   const [file, setFile] = useState(null);
   const [posting, setPosting] = useState(false);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await apiRequest({
+          url: `/users/get-user`,
+          method: 'get',
+          token: user.token,
+        });
+
+        if (response.status === 'failed') {
+          console.log(response.message);
+        } else {
+          const userData = { token: user?.token, ...response?.data?.user };
+          dispatch(userLogin(userData));
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchUser();
+  }, []);
 
   const {
     register,
@@ -91,12 +114,12 @@ const Home = ({ searchData, showSearch, setSearchData, setShowSearch }) => {
           {/* left */}
           <div className="hidden w-1/3 lg:w-1/4 h-full md:flex flex-col md:gap-6 overflow-y-auto ">
             <ProfileCard user={user} />
-            <FriendsCard friends={user?.friends} />
+            <UserList title="friends" data={user.friends} />
           </div>
           {/* center */}
           {showSearch ? (
             <div className="flex-1 h-full bg-black flex flex-col md:gap-6 overflow-y-auto rounded-xl">
-              <UserList data={searchData} />
+              <UserList data={searchData} title="results" />
             </div>
           ) : (
             <div className="flex-1 h-full bg-black flex flex-col md:gap-6 overflow-y-auto rounded-xl">
@@ -162,6 +185,10 @@ const Home = ({ searchData, showSearch, setSearchData, setShowSearch }) => {
               <FeedContainer />
             </div>
           )}
+
+          <div className="hidden w-1/3 lg:w-1/4 h-full md:flex flex-col gap-6 overflow-y-auto ">
+            <UserList title="requests" data={user.inRequest} />
+          </div>
         </div>
       </div>
       {edit && <EditProfile />}

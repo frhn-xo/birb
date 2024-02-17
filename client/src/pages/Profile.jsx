@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { userLogin } from '../redux/userSlice';
 import { useParams } from 'react-router-dom';
 import {
   FeedContainer,
@@ -15,6 +16,7 @@ const Profile = ({ searchData, showSearch, setSearchData, setShowSearch }) => {
   const { user, edit } = useSelector((state) => state.user);
   const { id } = useParams();
   const [userInfo, setUserInfo] = useState(user);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -29,6 +31,10 @@ const Profile = ({ searchData, showSearch, setSearchData, setShowSearch }) => {
           console.log(response.message);
         } else {
           setUserInfo(response.data.user);
+          if (user._id === response.data.user._id) {
+            const userData = { token: user?.token, ...response?.data?.user };
+            dispatch(userLogin(userData));
+          }
         }
       } catch (error) {
         console.error(error);
@@ -54,7 +60,7 @@ const Profile = ({ searchData, showSearch, setSearchData, setShowSearch }) => {
 
           {/* CENTER */}
           {showSearch ? (
-            <UserList data={searchData} />
+            <UserList data={searchData} title="users" />
           ) : (
             <div className="flex-1 h-full bg-black flex flex-col gap-6 overflow-y-auto rounded-xl">
               <div className="visible md:hidden">
@@ -66,7 +72,7 @@ const Profile = ({ searchData, showSearch, setSearchData, setShowSearch }) => {
 
           {/* RIGHT */}
           <div className="hidden w-1/3 lg:w-1/4 h-full md:flex flex-col gap-6 overflow-y-auto ">
-            <FriendsCard friends={userInfo?.friends} />
+            <UserList title="friends" data={userInfo.friends} />
           </div>
         </div>
       </div>

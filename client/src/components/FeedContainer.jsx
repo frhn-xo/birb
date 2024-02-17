@@ -48,7 +48,7 @@ const FeedContainer = () => {
       }
     };
     fetchData();
-  }, [id]);
+  }, []);
 
   return (
     <div className="pb-3">
