@@ -9,9 +9,14 @@ import { MdOutlineCancel } from 'react-icons/md';
 import { FiCheck } from 'react-icons/fi';
 import moment from 'moment';
 import UserList from './UserList';
-
 import { NoProfile } from '../assets';
-import { updateProfile } from '../redux/userSlice';
+import { apiRequest } from '../utils';
+import {
+  updateOutList,
+  updateProfile,
+  updateFriend,
+  updateInRequest,
+} from '../redux/userSlice';
 
 const ProfileCard = ({ user: profile }) => {
   const { user } = useSelector((state) => state.user);
@@ -20,8 +25,79 @@ const ProfileCard = ({ user: profile }) => {
   const [userListData, setuserListData] = useState(user.friends);
   const [userListTitle, setUserListTitle] = useState('friends');
 
-  // console.log(profile.name, 'profile', profile);
-  // console.log(user.name, 'user', user);
+  const addFriend = async () => {
+    try {
+      const response = await apiRequest({
+        url: `users/friend-request`,
+        method: 'post',
+        data: { requestTo: profile._id },
+        token: user?.token,
+      });
+      console.log('Friend request status - ', response.status);
+      if (response.status === 'success') {
+        const outListProfile = {
+          _id: profile._id,
+          name: profile.name,
+          image: profile?.image,
+        };
+        dispatch(updateOutList(outListProfile));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const acceptFriend = async () => {
+    try {
+      const response = await apiRequest({
+        url: `users/accept-request`,
+        method: 'post',
+        data: { status: 'Accepted', requestBy: profile._id },
+        token: user?.token,
+      });
+      console.log('Friend accept status - ', response.status);
+
+      if (response.status === 'success') {
+        const friendProfile = {
+          _id: profile._id,
+          name: profile.name,
+          image: profile?.image,
+        };
+        dispatch(updateFriend(friendProfile));
+      }
+    } catch (error) {
+      console.error(
+        'Error accepting friend request:',
+        error.response.data.message
+      );
+    }
+  };
+
+  const rejectFriend = async () => {
+    try {
+      const response = await apiRequest({
+        url: `users/accept-request`,
+        method: 'post',
+        data: { status: 'Rejected', requestBy: profile._id },
+        token: user?.token,
+      });
+      console.log('Friend accept status - ', response.status);
+
+      if (response.status === 'success') {
+        // const friendProfile = {
+        //   _id: profile._id,
+        //   name: profile.name,
+        //   image: profile?.image,
+        // };
+        dispatch(updateInRequest(profile._id));
+      }
+    } catch (error) {
+      console.error(
+        'Error accepting friend request:',
+        error.response.data.message
+      );
+    }
+  };
 
   const handleFriends = () => {
     setShowUserList(true);
@@ -71,12 +147,12 @@ const ProfileCard = ({ user: profile }) => {
                   onClick={() => dispatch(updateProfile(true))}
                 />
               </div>
-            ) : profile?.friends?.some((friend) => friend._id === user?._id) ? (
+            ) : user?.friends?.some((friend) => friend._id === profile?._id) ? (
               <div className=" text-indigo-300 cursor-pointer rounded-lg p-1 px-2 mr-3">
-                <IoSparklesSharp size={26} onClick={() => {}} />
+                <IoSparklesSharp size={26} />
               </div>
-            ) : profile?.inRequest?.some(
-                (request) => request._id === user?._id
+            ) : user?.outRequest?.some(
+                (request) => request._id === profile?._id
               ) ? (
               <div className=" text-indigo-300 cursor-pointer rounded-lg p-1 px-2 mr-3 flex gap-1">
                 <span className="md:hidden text-xs font-semibold pt-1.5">
@@ -84,20 +160,35 @@ const ProfileCard = ({ user: profile }) => {
                 </span>
                 <LuTimer size={26} />
               </div>
-            ) : profile?.outRequest?.some(
-                (request) => request._id === user?._id
+            ) : user?.inRequest?.some(
+                (request) => request._id === profile?._id
               ) ? (
-              <div className="flex  mr-3">
+              <div className="flex mr-3">
                 <div className=" text-indigo-300 hover:bg-indigo-700 cursor-pointer rounded-lg p-1 px-2">
-                  <FiCheck size={26} />
+                  <FiCheck
+                    size={26}
+                    onClick={() => {
+                      acceptFriend();
+                    }}
+                  />
                 </div>
                 <div className=" text-indigo-300 hover:bg-indigo-700 cursor-pointer rounded-lg p-1 px-2">
-                  <MdOutlineCancel size={26} onClick={() => {}} />
+                  <MdOutlineCancel
+                    size={26}
+                    onClick={() => {
+                      rejectFriend();
+                    }}
+                  />
                 </div>
               </div>
             ) : (
               <div className=" text-indigo-300 hover:bg-indigo-700 cursor-pointer rounded-lg p-1 px-2 mr-3">
-                <IoPersonAdd size={26} onClick={() => {}} />
+                <IoPersonAdd
+                  size={26}
+                  onClick={() => {
+                    addFriend();
+                  }}
+                />
               </div>
             )}
           </div>

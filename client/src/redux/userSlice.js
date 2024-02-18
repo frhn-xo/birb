@@ -20,9 +20,27 @@ const userSlice = createSlice({
     updateProfile(state, action) {
       state.edit = action.payload;
     },
+    updateFriend(state, action) {
+      state.user.friends.push(action.payload);
+    },
+    updateOutList(state, action) {
+      state.user.outRequest.push(action.payload);
+    },
+    updateInRequest(state, action) {
+      state.user.inRequest = state.user.inRequest.filter(
+        (request) => request._id !== action.payload
+      );
+    },
   },
 });
 
-export const { userLogin, userLogout, updateProfile } = userSlice.actions;
+export const {
+  userLogin,
+  userLogout,
+  updateProfile,
+  updateFriend,
+  updateOutList,
+  updateInRequest,
+} = userSlice.actions;
 
 export default userSlice.reducer;

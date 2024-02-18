@@ -4,7 +4,6 @@ import { userLogin } from '../redux/userSlice';
 import { useParams } from 'react-router-dom';
 import {
   FeedContainer,
-  FriendsCard,
   ProfileCard,
   TopBar,
   EditProfile,
@@ -21,19 +20,42 @@ const Profile = ({ searchData, showSearch, setSearchData, setShowSearch }) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await apiRequest({
+        const responseProfile = await apiRequest({
           url: `/users/get-user/${id}`,
           method: 'get',
           token: user.token,
         });
 
-        if (response.status === 'failed') {
-          console.log(response.message);
+        if (responseProfile.status === 'failed') {
+          console.log(responseProfile.message);
         } else {
-          setUserInfo(response.data.user);
-          if (user._id === response.data.user._id) {
-            const userData = { token: user?.token, ...response?.data?.user };
+          console.log('profile page useeffect ', responseProfile.data);
+          setUserInfo(responseProfile.data.user);
+          if (user._id === responseProfile.data.user._id) {
+            const userData = {
+              token: user?.token,
+              ...responseProfile?.data?.user,
+            };
             dispatch(userLogin(userData));
+          } else {
+            const responseUser = await apiRequest({
+              url: `/users/get-user/${user._id}`,
+              method: 'get',
+              token: user.token,
+            });
+            if (responseUser.status === 'failed') {
+              console.log(responseUser.message);
+            } else {
+              console.log(
+                'profile page useeffect for our user',
+                responseUser.data
+              );
+              const userData = {
+                token: user?.token,
+                ...responseUser?.data?.user,
+              };
+              dispatch(userLogin(userData));
+            }
           }
         }
       } catch (error) {

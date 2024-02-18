@@ -5,7 +5,6 @@ import { userLogin } from '../redux/userSlice';
 import {
   TopBar,
   ProfileCard,
-  FriendsCard,
   CustomButton,
   TextInput,
   EditProfile,
