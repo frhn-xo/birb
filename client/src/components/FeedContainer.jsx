@@ -48,7 +48,7 @@ const FeedContainer = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [id]);
 
   return (
     <div className="pb-3">
@@ -67,7 +67,6 @@ const FeedContainer = () => {
             post={post}
             user={user}
             deletePost={() => {}}
-            likePost={() => {}}
           />
         ))
       ) : (

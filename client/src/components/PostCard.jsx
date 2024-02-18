@@ -7,6 +7,7 @@ import { BiSolidHeart, BiHeart, BiComment } from 'react-icons/bi';
 import { MdOutlineDelete } from 'react-icons/md';
 import { useForm } from 'react-hook-form';
 import { CustomButton, TextInput } from '../components';
+import { apiRequest } from '../utils';
 
 const CommentForm = ({ user, id, replyAt, getComments }) => {
   const [loading, setLoading] = useState(false);
@@ -62,13 +63,31 @@ const CommentForm = ({ user, id, replyAt, getComments }) => {
     </form>
   );
 };
-const PostCard = ({ post, user, deletePost, likePost }) => {
+
+const PostCard = ({ post, user, deletePost }) => {
   const [showAll, setShowAll] = useState(0);
-  const [showReply, setShowReply] = useState(0);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [replyComments, setReplyComments] = useState(0);
   const [showComments, setShowComments] = useState(0);
+  const [like, setLike] = useState(post?.likes?.includes(user?._id));
+
+  const likePost = async () => {
+    setLike((p) => !p);
+    try {
+      const like = await apiRequest({
+        url: `/posts/like/${post._id}`,
+        method: 'put',
+        token: user.token,
+      });
+
+      if (!like.data.success) {
+        setLike((p) => !p);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const getComments = async () => {
     setReplyComments(0);
@@ -132,8 +151,13 @@ const PostCard = ({ post, user, deletePost, likePost }) => {
         )}
       </div>
       <div className="mt-4 flex justify-end gap-4 items-center px-3 py-2">
-        <p className="flex gap-2 cursor-pointer">
-          {post?.likes?.includes(user?._id) ? (
+        <p
+          className="flex gap-2 cursor-pointer"
+          onClick={() => {
+            likePost();
+          }}
+        >
+          {like ? (
             <BiSolidHeart size={24} className="text-fuchsia-500" />
           ) : (
             <BiHeart size={24} />

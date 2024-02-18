@@ -170,7 +170,7 @@ export const updateUser = async (req, res, next) => {
     }
 
     const existingUserWithUpdatedName = await Users.findOne({
-      _id: { $ne: userId }, // Exclude the current user from the check
+      _id: { $ne: userId },
       name: name?.trim(),
     });
 

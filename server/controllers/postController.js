@@ -87,11 +87,11 @@ export const getPosts = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(404).json({ message: error.message });
+    res.status(404).json({ success: false, message: error.message });
   }
 };
 
-export const getUserPosts = async (req, res, next) => {
+export const getUserPosts = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -110,11 +110,45 @@ export const getUserPosts = async (req, res, next) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(404).json({ message: error.message });
+    res.status(404).json({ success: false, message: error.message });
   }
 };
 
-export const likePost = async (req, res, next) => {
+export const likePost = async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const { id } = req.params;
+
+    const post = await Posts.findById(id);
+
+    const index = post.likes.findIndex((pid) => pid === String(userId));
+
+    let action = '';
+
+    if (index === -1) {
+      post.likes.push(userId);
+      action = 'liked';
+    } else {
+      post.likes = post.likes.filter((pid) => pid !== String(userId));
+      action = 'unliked';
+    }
+
+    const newPost = await Posts.findByIdAndUpdate(id, post, {
+      new: true,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: `${action} post successfully`,
+      data: newPost,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({ success: false, message: error.message });
+  }
+};
+
+export const commentPost = async (req, res) => {
   try {
     const { userId } = req.user;
     const { id } = req.params;
@@ -140,11 +174,41 @@ export const likePost = async (req, res, next) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(404).json({ message: error.message });
+    res.status(404).json({ success: false, message: error.message });
   }
 };
 
-export const deletePost = async (req, res, next) => {
+export const getCommentPost = async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const { id } = req.params;
+
+    const post = await Posts.findById(id);
+
+    const index = post.likes.findIndex((pid) => pid === String(userId));
+
+    if (index === -1) {
+      post.likes.push(userId);
+    } else {
+      post.likes = post.likes.filter((pid) => pid !== String(userId));
+    }
+
+    const newPost = await Posts.findByIdAndUpdate(id, post, {
+      new: true,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'liked post successfully',
+      data: newPost,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({ success: false, message: error.message });
+  }
+};
+
+export const deletePost = async (req, res) => {
   try {
     const { userId } = req.user;
     const { id } = req.params;
@@ -179,6 +243,6 @@ export const deletePost = async (req, res, next) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(404).json({ message: error.message });
+    res.status(404).json({ success: false, message: error.message });
   }
 };

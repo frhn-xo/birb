@@ -6,7 +6,9 @@ import {
   deletePost,
   getPosts,
   getUserPosts,
+  commentPost,
   likePost,
+  getCommentPost,
 } from '../controllers/postController.js';
 
 const router = express.Router();
@@ -16,6 +18,10 @@ router.get('/', userAuth, getPosts);
 router.get('/get-user-post/:id', userAuth, getUserPosts);
 
 router.put('/like/:id', userAuth, likePost);
+
+router.put('/get-comment/:id', userAuth, getCommentPost);
+
+router.put('/comment/:id', userAuth, commentPost);
 
 router.delete('/:id', userAuth, deletePost);
 
