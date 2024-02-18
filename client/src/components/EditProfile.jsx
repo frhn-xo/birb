@@ -10,7 +10,7 @@ import { apiRequest } from '../utils';
 const EditProfile = () => {
   const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
-  const [errMsg, setErrMsg] = useState('');
+  const [errMsg, setErrMsg] = useState({ message: '' });
   const [posting, setPosting] = useState(false);
   const [file, setFile] = useState(null);
 
@@ -56,7 +56,9 @@ const EditProfile = () => {
       });
 
       if (res.status === 'failed') {
-        setErrMsg(res.message || 'Unknown error occurred');
+        setErrMsg(
+          { message: res.message, status: 'failed' } || 'Unknown error occurred'
+        );
       } else {
         setErrMsg(res);
         const userData = {
@@ -78,6 +80,8 @@ const EditProfile = () => {
   const handleClose = () => {
     dispatch(updateProfile(false));
   };
+
+  console.log(errMsg);
 
   return (
     <>
@@ -156,7 +160,7 @@ const EditProfile = () => {
                 />
               </label>
 
-              {errMsg?.message && (
+              {errMsg?.message != '' && (
                 <span
                   role="alert"
                   className={`text-sm ${

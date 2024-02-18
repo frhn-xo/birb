@@ -15,9 +15,14 @@ export const register = async (req, res) => {
       throw new Error('Provide Required Fields!');
     }
 
-    const userExist = await Users.findOne({ email });
+    const userExist = await Users.findOne({ $or: [{ email }, { name }] });
+
     if (userExist) {
-      throw new Error('Email Address already exists');
+      if (userExist.email === email) {
+        throw new Error('Email Address already exists');
+      } else {
+        throw new Error('Name already exists');
+      }
     }
     const hashedPassword = await hashString(password.trim());
     const user = await Users.create({

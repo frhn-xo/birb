@@ -169,6 +169,18 @@ export const updateUser = async (req, res, next) => {
       });
     }
 
+    const existingUserWithUpdatedName = await Users.findOne({
+      _id: { $ne: userId }, // Exclude the current user from the check
+      name: name?.trim(),
+    });
+
+    if (existingUserWithUpdatedName) {
+      return res.status(400).json({
+        success: false,
+        message: 'Given name is already in use by another user',
+      });
+    }
+
     let publicId = null;
 
     const user = await Users.findById(userId);
