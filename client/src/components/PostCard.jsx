@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { NoProfile } from '../assets';
-import { postComments } from '../assets/data';
 import moment from 'moment';
 import { BiSolidHeart, BiHeart, BiComment } from 'react-icons/bi';
 import { MdOutlineDelete } from 'react-icons/md';
@@ -9,16 +8,39 @@ import { useForm } from 'react-hook-form';
 import { CustomButton, TextInput } from '../components';
 import { apiRequest } from '../utils';
 
-const CommentForm = ({ user, id, replyAt, getComments }) => {
+const CommentForm = ({ user, postId, getCommentsPost }) => {
   const [loading, setLoading] = useState(false);
-  const [errMsg, serErrMsg] = useState('');
+  const [errMsg, setErrMsg] = useState('');
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm({ mode: 'onChange' });
-  const onSubmit = async (data) => {};
+  const onSubmit = async (data) => {
+    try {
+      console.log(data);
+      setLoading(true);
+      const res = await apiRequest({
+        url: `/posts/comment/${postId}`,
+        data,
+        method: 'put',
+        token: user?.token,
+      });
+
+      if (res?.status === 'failed') {
+        setErrMsg(res);
+      } else {
+        setErrMsg(res);
+        getCommentsPost();
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+      reset();
+    }
+  };
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -33,7 +55,7 @@ const CommentForm = ({ user, id, replyAt, getComments }) => {
         <TextInput
           name="comment"
           styles="w-full rounded-full ring-indigo-950 h-9"
-          placeholder={replyAt ? `Reply @${replyAt}` : '....comment on this'}
+          placeholder="....comment on this"
           register={register('comment', { required: 'Comment is empty' })}
           error={errors.comment ? errors.comment.message : ''}
         />
@@ -68,7 +90,6 @@ const PostCard = ({ post, user, deletePost }) => {
   const [showAll, setShowAll] = useState(0);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [replyComments, setReplyComments] = useState(0);
   const [showComments, setShowComments] = useState(0);
   const [like, setLike] = useState({
     value: post?.likes?.includes(user?._id),
@@ -101,10 +122,25 @@ const PostCard = ({ post, user, deletePost }) => {
     }
   };
 
-  const getComments = async () => {
-    setReplyComments(0);
-    setComments(postComments);
-    setLoading(false);
+  const getCommentsPost = async () => {
+    try {
+      setLoading(true);
+      const comments = await apiRequest({
+        url: `/posts/get-comment/${post._id}`,
+        method: 'get',
+        token: user.token,
+      });
+      console.log(comments);
+      if (!comments.data.success) {
+        console.log('failed to get comments');
+      } else {
+        setComments(comments.data.comments);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -180,10 +216,15 @@ const PostCard = ({ post, user, deletePost }) => {
           className="flex gap-2 cursor-pointer"
           onClick={() => {
             setShowComments(showComments === post._id ? null : post._id);
-            getComments(post?.id);
+            getCommentsPost();
           }}
         >
-          <BiComment size={24} />
+          {showComments !== post._id ? (
+            <BiComment size={24} />
+          ) : (
+            <BiComment size={24} className="text-fuchsia-400" />
+          )}
+
           {post?.comments?.length}
         </p>
         {user?._id === post?.userId?._id && (
@@ -199,11 +240,13 @@ const PostCard = ({ post, user, deletePost }) => {
         <div className="w-full border-indigo-900 border-b pb-4">
           <CommentForm
             user={user}
-            id={post?._id}
-            getComments={() => getComments(post?._id)}
+            postId={post?._id}
+            getCommentsPost={getCommentsPost}
           />
           {loading ? (
-            '....loading'
+            <p className="text-amber-500 text-sm px-5">
+              {'....hold on, loading comments'}
+            </p>
           ) : comments?.length > 0 ? (
             comments?.map((comment) => (
               <div className="w-full py-2" key={comment?._id}>
@@ -218,7 +261,7 @@ const PostCard = ({ post, user, deletePost }) => {
                   <div>
                     <Link to={`/profile/${comment?.userId?._id}`}>
                       <p className="font-medium text-sm">
-                        {comment?.userId.name}
+                        {comment?.userId?.name}
                       </p>
                     </Link>
                     <span className="text-xs opacity-50">
@@ -228,16 +271,6 @@ const PostCard = ({ post, user, deletePost }) => {
                 </div>
                 <div className="ml-12 flex items-center justify-between">
                   <p className="text-sm">{comment?.comment}</p>
-                  <div className="flex items-center space-x-2">
-                    <p>
-                      {comment?.likes?.includes(user?._id) ? (
-                        <BiSolidHeart size={20} className="text-fuchsia-400" />
-                      ) : (
-                        <BiHeart size={20} />
-                      )}
-                    </p>
-                    <p className="text-sm">{comment?.likes?.length}</p>
-                  </div>
                 </div>
               </div>
             ))

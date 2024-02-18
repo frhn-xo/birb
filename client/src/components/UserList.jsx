@@ -7,7 +7,6 @@ const UserList = ({ data, title, setClose = false }) => {
   const handleClose = () => {
     if (setClose !== false) setClose(false);
   };
-  console.log(data);
   return (
     <>
       <div className="w-full bg-black shadow-sm rounded-2xl px-5 py-5 text-slate-300">

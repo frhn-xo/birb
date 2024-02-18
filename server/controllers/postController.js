@@ -1,5 +1,6 @@
 import Posts from '../models/postModel.js';
 import Users from '../models/userModel.js';
+import Comments from '../models/commentModel.js';
 import mongoose from 'mongoose';
 import { v2 as cloudinary } from 'cloudinary';
 import fs from 'fs';
@@ -60,10 +61,7 @@ export const getPosts = async (req, res) => {
     friends.push(userId);
 
     const posts = await Posts.find()
-      .populate({
-        path: 'userId',
-        select: 'name bio image -password',
-      })
+      .populate('userId')
       .sort({ _id: -1 })
       .limit(300);
 
@@ -88,6 +86,24 @@ export const getPosts = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(404).json({ success: false, message: error.message });
+  }
+};
+
+export const getSinglePost = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const post = await Posts.findById(id);
+    res.status(200).json({
+      success: true,
+      message: 'got posts successfully',
+      data: post,
+    });
+  } catch (error) {
+    console.log(error);
+    res
+      .status(404)
+      .json({ success: false, message: error.message })
+      .populate('userId');
   }
 };
 
@@ -152,26 +168,31 @@ export const commentPost = async (req, res) => {
   try {
     const { userId } = req.user;
     const { id } = req.params;
+    const { comment } = req.body;
 
-    const post = await Posts.findById(id);
+    console.log(userId);
 
-    const index = post.likes.findIndex((pid) => pid === String(userId));
-
-    if (index === -1) {
-      post.likes.push(userId);
-    } else {
-      post.likes = post.likes.filter((pid) => pid !== String(userId));
+    if (!comment) {
+      throw new Error('Provide comment field!');
     }
 
-    const newPost = await Posts.findByIdAndUpdate(id, post, {
-      new: true,
+    const post = await Posts.findById(id);
+    if (!post) {
+      throw new Error('Post not found!');
+    }
+
+    const newComment = new Comments({
+      userId,
+      postId: post._id,
+      comment,
     });
 
-    res.status(200).json({
-      success: true,
-      message: 'liked post successfully',
-      data: newPost,
-    });
+    await newComment.save();
+
+    post.comments.push(newComment._id);
+    await post.save();
+
+    res.status(201).json({ success: true, comment: newComment });
   } catch (error) {
     console.log(error);
     res.status(404).json({ success: false, message: error.message });
@@ -180,28 +201,16 @@ export const commentPost = async (req, res) => {
 
 export const getCommentPost = async (req, res) => {
   try {
-    const { userId } = req.user;
     const { id } = req.params;
 
-    const post = await Posts.findById(id);
+    const comments = await Comments.find({ postId: id })
+      .populate({
+        path: 'userId',
+        select: 'name image -password',
+      })
+      .sort({ _id: -1 });
 
-    const index = post.likes.findIndex((pid) => pid === String(userId));
-
-    if (index === -1) {
-      post.likes.push(userId);
-    } else {
-      post.likes = post.likes.filter((pid) => pid !== String(userId));
-    }
-
-    const newPost = await Posts.findByIdAndUpdate(id, post, {
-      new: true,
-    });
-
-    res.status(200).json({
-      success: true,
-      message: 'liked post successfully',
-      data: newPost,
-    });
+    res.status(200).json({ success: true, comments });
   } catch (error) {
     console.log(error);
     res.status(404).json({ success: false, message: error.message });

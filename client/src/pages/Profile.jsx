@@ -84,7 +84,7 @@ const Profile = ({ searchData, showSearch, setSearchData, setShowSearch }) => {
           {showSearch ? (
             <UserList data={searchData} title="users" />
           ) : (
-            <div className="flex-1 h-full bg-black flex flex-col gap-6 overflow-y-auto rounded-xl">
+            <div className="flex-1 h-full bg-black flex flex-col overflow-y-auto rounded-xl">
               <div className="visible md:hidden">
                 <ProfileCard user={userInfo} />
               </div>

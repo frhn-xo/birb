@@ -114,13 +114,13 @@ const ProfileCard = ({ user: profile }) => {
   const handleSent = () => {
     setShowUserList(true);
     setuserListData(user?.outRequest);
-    setUserListTitle('requests from sent');
+    setUserListTitle('requests you sent');
   };
 
   return (
     <div>
-      <div className="w-full bg-black flex flex-col items-center shadow-sm rounded-md px-7 pt-5 sm:px-6 sm:py-3 text-slate-300 ">
-        <div className="w-full flex items-center justify-between border-b border-indigo-900 pb-5 ">
+      <div className="flex flex-col items-center shadow-sm rounded-md px-4 py-2 pb-3 sm:px-6 sm:py-3 text-slate-300 mt-5 m-3 sm:m-0 bg-black ">
+        <div className="w-full flex items-center justify-between border-b border-indigo-900 pb-5">
           <Link to={'/profile/' + profile?._id} className="flex gap-2">
             <img
               src={
@@ -198,7 +198,7 @@ const ProfileCard = ({ user: profile }) => {
           <div className="flex gap-2 items-center ">
             <span>
               {profile?._id === user?._id
-                ? user?.bio
+                ? user?.bio ?? <span className="opacity-50">{'no bio :('}</span>
                 : profile?.bio ?? (
                     <span className="opacity-50">{'no bio :('}</span>
                   )}
@@ -256,10 +256,6 @@ const ProfileCard = ({ user: profile }) => {
             )}
           </div>
 
-          <div className="flex items-center justify-between">
-            <span className="">Who viewed your profile</span>
-            <span className=" text-lg">{profile?.views?.length}</span>
-          </div>
           <span className="text-base text-blue">
             {profile?.verified ? 'Verified Account' : 'Not Verified'}
           </span>

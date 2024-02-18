@@ -9,17 +9,22 @@ import {
   commentPost,
   likePost,
   getCommentPost,
+  getSinglePost,
 } from '../controllers/postController.js';
 
 const router = express.Router();
 
-router.post('/create-post', userAuth, diskUpload.single('image'), createPost);
 router.get('/', userAuth, getPosts);
+
+router.get('/:id', userAuth, getSinglePost);
+
+router.post('/create-post', userAuth, diskUpload.single('image'), createPost);
+
 router.get('/get-user-post/:id', userAuth, getUserPosts);
 
 router.put('/like/:id', userAuth, likePost);
 
-router.put('/get-comment/:id', userAuth, getCommentPost);
+router.get('/get-comment/:id', userAuth, getCommentPost);
 
 router.put('/comment/:id', userAuth, commentPost);
 
