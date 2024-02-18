@@ -70,11 +70,23 @@ const PostCard = ({ post, user, deletePost }) => {
   const [loading, setLoading] = useState(false);
   const [replyComments, setReplyComments] = useState(0);
   const [showComments, setShowComments] = useState(0);
-  const [like, setLike] = useState(post?.likes?.includes(user?._id));
+  const [like, setLike] = useState({
+    value: post?.likes?.includes(user?._id),
+    count: post?.likes?.length,
+  });
 
   const likePost = async () => {
-    setLike((p) => !p);
     try {
+      setLike((p) => {
+        const updatedValue = !p.value;
+        const updatedCount = updatedValue ? p.count + 1 : p.count - 1;
+
+        return {
+          ...p,
+          value: updatedValue,
+          count: updatedCount,
+        };
+      });
       const like = await apiRequest({
         url: `/posts/like/${post._id}`,
         method: 'put',
@@ -82,7 +94,7 @@ const PostCard = ({ post, user, deletePost }) => {
       });
 
       if (!like.data.success) {
-        setLike((p) => !p);
+        console.log('failed to like');
       }
     } catch (error) {
       console.error(error);
@@ -157,12 +169,12 @@ const PostCard = ({ post, user, deletePost }) => {
             likePost();
           }}
         >
-          {like ? (
+          {like.value ? (
             <BiSolidHeart size={24} className="text-fuchsia-500" />
           ) : (
             <BiHeart size={24} />
           )}
-          {post?.likes?.length}
+          {like.count}
         </p>
         <p
           className="flex gap-2 cursor-pointer"
