@@ -5,25 +5,21 @@ import logo from '../assets/birb.png';
 import { useForm } from 'react-hook-form';
 import TextInput from './TextInput';
 import CustomButton from './CustomButton';
-import { updateProfile } from '../redux/userSlice';
 import { apiRequest } from '../utils';
 import { IoSearch } from 'react-icons/io5';
 import { MdLogout } from 'react-icons/md';
+import { userLogout } from '../redux/userSlice';
 
 const TopBar = ({ setSearchData, setShowSearch }) => {
   const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
-  const {
-    register: registerSearch,
-    handleSubmit: handleSubmitSearch,
-    formState: { errors: errorsSearch },
-  } = useForm();
+  const { register: registerSearch, handleSubmit: handleSubmitSearch } =
+    useForm();
 
   const {
     register: registerMobileSearch,
     handleSubmit: handleSubmitMobileSearch,
-    formState: { errors: errorsMobileSearch },
   } = useForm();
 
   const handleSearch = async (data) => {
@@ -46,6 +42,11 @@ const TopBar = ({ setSearchData, setShowSearch }) => {
       console.error(error);
       setShowSearch(false);
     }
+  };
+
+  const handleLogout = () => {
+    console.log('loggin out');
+    dispatch(userLogout());
   };
 
   return (
@@ -73,7 +74,9 @@ const TopBar = ({ setSearchData, setShowSearch }) => {
         </form>
 
         <CustomButton
-          onClick={() => dispatch(Logout())}
+          onClick={() => {
+            handleLogout();
+          }}
           title="Logout"
           containerStyles="hidden md:block justify-center bg-black text-indigo-300 sm:rounded-xl rounded-md hover:bg-indigo-700 font-semibold ml-auto sm:mt-2 sm:p-3 sm:py-2 p-1 my-2 mt-3 sm:m-0
           hover:text-slate-300"
@@ -99,7 +102,9 @@ const TopBar = ({ setSearchData, setShowSearch }) => {
         </form>
 
         <button
-          onClick={() => dispatch(Logout())}
+          onClick={() => {
+            handleLogout();
+          }}
           className="md:hidden bg-black text-indigo-300 hover:bg-indigo-700 mt-2 rounded-md flex items-center justify-center w-10 h-9 pl-0"
         >
           <MdLogout size={20} />

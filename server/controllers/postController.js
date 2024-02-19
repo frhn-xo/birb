@@ -169,9 +169,6 @@ export const commentPost = async (req, res) => {
     const { userId } = req.user;
     const { id } = req.params;
     const { comment } = req.body;
-
-    console.log(userId);
-
     if (!comment) {
       throw new Error('Provide comment field!');
     }

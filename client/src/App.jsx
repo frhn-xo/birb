@@ -50,6 +50,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/verify" element={<ResetPassword />} />
       </Routes>
     </div>
   );

@@ -64,7 +64,7 @@ const Register = () => {
           />
           <TextInput
             name="email"
-            label="Email Address (real, to recieve OTP)"
+            label="Email Address (real, to receive OTP)"
             type="email"
             register={register('email', {
               required: 'Email Address is required',

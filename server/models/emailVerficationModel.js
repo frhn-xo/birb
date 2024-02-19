@@ -2,7 +2,7 @@ import mongoose, { Schema } from 'mongoose';
 
 const emailVerificationSchema = Schema({
   userId: String,
-  token: String,
+  otp: String,
   createdAt: Date,
   expiresAt: Date,
 });

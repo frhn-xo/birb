@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import {
@@ -14,8 +14,10 @@ const FeedContainer = () => {
   const dispatch = useDispatch();
   const { posts, loading, error } = useSelector((state) => state.posts);
   const { user } = useSelector((state) => state.user);
+  const [didDelete, setDidDelete] = useState(true);
 
   useEffect(() => {
+    console.log('inside rerender');
     const fetchData = async () => {
       try {
         dispatch(getPostsStart());
@@ -49,6 +51,11 @@ const FeedContainer = () => {
     };
     fetchData();
   }, [id]);
+  useEffect(() => {
+    return () => {
+      setDidDelete(false);
+    };
+  }, [didDelete]);
 
   return (
     <div className="pb-3">
@@ -66,7 +73,7 @@ const FeedContainer = () => {
             key={post._id}
             post={post}
             user={user}
-            deletePost={() => {}}
+            setDidDelete={setDidDelete}
           />
         ))
       ) : (

@@ -7,6 +7,8 @@ import { MdOutlineDelete } from 'react-icons/md';
 import { useForm } from 'react-hook-form';
 import { CustomButton, TextInput } from '../components';
 import { apiRequest } from '../utils';
+import { deletePostById } from '../redux/postSlice';
+import { useDispatch } from 'react-redux';
 
 const CommentForm = ({ user, postId, getCommentsPost }) => {
   const [loading, setLoading] = useState(false);
@@ -86,7 +88,7 @@ const CommentForm = ({ user, postId, getCommentsPost }) => {
   );
 };
 
-const PostCard = ({ post, user, deletePost }) => {
+const PostCard = ({ post, user, setDidDelete }) => {
   const [showAll, setShowAll] = useState(0);
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -95,7 +97,7 @@ const PostCard = ({ post, user, deletePost }) => {
     value: post?.likes?.includes(user?._id),
     count: post?.likes?.length,
   });
-
+  const dispatch = useDispatch();
   const likePost = async () => {
     try {
       setLike((p) => {
@@ -121,7 +123,25 @@ const PostCard = ({ post, user, deletePost }) => {
       console.error(error);
     }
   };
-
+  const deletePost = async () => {
+    try {
+      console.log('delete mara');
+      setDidDelete(true);
+      const deleteResponse = await apiRequest({
+        url: `/posts/${post._id}`,
+        method: 'delete',
+        token: user.token,
+      });
+      if (deleteResponse.data.success) {
+        dispatch(deletePostById(post._id));
+        console.log(deleteResponse.data.message);
+      } else {
+        console.log('failed to delete');
+      }
+    } catch (error) {
+      console.log('failed to delete');
+    }
+  };
   const getCommentsPost = async () => {
     try {
       setLoading(true);
@@ -230,7 +250,9 @@ const PostCard = ({ post, user, deletePost }) => {
         {user?._id === post?.userId?._id && (
           <div
             className="flex gap-1 items-center text-base "
-            onClick={() => deletePost(post?._id)}
+            onClick={() => {
+              deletePost();
+            }}
           >
             <MdOutlineDelete size={24} />
           </div>

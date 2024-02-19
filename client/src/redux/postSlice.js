@@ -26,10 +26,19 @@ const postSlice = createSlice({
       const newPost = action.payload;
       state.posts.unshift(action.payload);
     },
+    deletePostById(state, action) {
+      const postIdToDelete = action.payload;
+      state.posts = state.posts.filter((post) => post._id !== postIdToDelete);
+    },
   },
 });
 
-export const { getPostsStart, getPostsSuccess, getPostsFailure, addPost } =
-  postSlice.actions;
+export const {
+  getPostsStart,
+  getPostsSuccess,
+  getPostsFailure,
+  addPost,
+  deletePostById,
+} = postSlice.actions;
 
 export default postSlice.reducer;

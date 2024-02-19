@@ -257,7 +257,15 @@ const ProfileCard = ({ user: profile }) => {
           </div>
 
           <span className="text-base text-blue">
-            {profile?.verified ? 'Verified Account' : 'Not Verified'}
+            {profile?.verified ? (
+              <div className="flex items-center text-sm opacity-50 text-right  justify-between">
+                <span>{'verifed'}</span>
+              </div>
+            ) : (
+              <div className="flex items-center text-sm opacity-50 text-right  justify-between">
+                <span>{'Email Not Verified'}</span>
+              </div>
+            )}
           </span>
           <div className="flex items-center text-sm opacity-50 text-right  justify-between">
             <span>{'Joined'}</span>
