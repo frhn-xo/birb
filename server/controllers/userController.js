@@ -97,7 +97,7 @@ export const verifyEmail = async (req, res) => {
 //   }
 // };
 
-export const getUser = async (req, res, next) => {
+export const getUser = async (req, res) => {
   try {
     const { userId } = req.user;
     const { id } = req.params;
@@ -156,7 +156,7 @@ export const search = async (req, res) => {
   }
 };
 
-export const updateUser = async (req, res, next) => {
+export const updateUser = async (req, res) => {
   let image = req.file;
   try {
     const { name, bio } = req.body;
@@ -237,7 +237,7 @@ export const updateUser = async (req, res, next) => {
   }
 };
 
-export const friendRequest = async (req, res, next) => {
+export const friendRequest = async (req, res) => {
   try {
     const { userId } = req.user;
     const { requestTo } = req.body;

@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { CustomButton, TextInput } from '../components';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { apiRequest } from '../utils';
+import { useDispatch } from 'react-redux';
+import { userRegister } from '../redux/userSlice';
 
 const Register = () => {
   const [errMsg, setErrMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const dispatch = useDispatch();
+  const navigateTo = useNavigate();
 
   const {
     register,
@@ -16,6 +20,7 @@ const Register = () => {
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
+    dispatch(userRegister({ email: data.email }));
     try {
       const res = await apiRequest({
         url: '/auth/register',
@@ -27,8 +32,8 @@ const Register = () => {
         setErrMsg(res);
       } else {
         setErrMsg(res);
-        setInterval(() => {
-          window.location.replace('/login');
+        setTimeout(() => {
+          navigateTo('/verify');
         }, 800);
       }
     } catch (error) {
@@ -100,11 +105,19 @@ const Register = () => {
             />
           )}
         </form>
-        <div className="text-indigo-300 text-sm flex flex-row justify-center">
-          <p>Already have an account ?</p>
-          <Link to="/login" className="underline">
-            Login
-          </Link>
+        <div className="text-indigo-300 text-sm flex flex-col justify-center">
+          <p>
+            Already have an account ?{' '}
+            <Link to="/login" className="underline">
+              Login
+            </Link>
+          </p>
+          <p>
+            Already got otp ?{' '}
+            <Link to="/verify" className="underline">
+              Verify
+            </Link>
+          </p>
         </div>
       </div>
     </div>

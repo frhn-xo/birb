@@ -34,47 +34,70 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+const generateOTP = () => {
+  const otp = Math.floor(100000 + Math.random() * 900000);
+  return otp.toString();
+};
+
 export const sendVerificationEmail = async (user, res) => {
-  const { _id, email, name } = user;
-  const token = _id + crypto.randomUUID();
-  const link = `${process.env.APP_URL}users/verify/${_id}/${token}`;
-
-  console.log(email, process.env.AUTH_EMAIL, process.env.AUTH_PASSWORD);
-
-  const mailOptions = {
-    to: email,
-    subject: 'Birb Email Verification',
-    html: `<div
-    style='font-family: sans-serif; font-size: 20px; color: #a3bffa; background-color: #000; padding: 20px; border-radius: 30px;
-    text-align: center; padding-bottom:30px'>
-    <p style="font-size: 15px; color: aliceblue; text-align: center;">birb</p>
-<h3 style="
-    font-weight: bold;
-    width: 100%;
-    font-size: 25px
-  ">Let's verify your account ${name} 🐤</h3>
-    <hr>
-    <br>
-    <a href=${link}
-        style="font-weight: bold; color: aliceblue; padding: 14px; text-decoration: none; background-color: #3c366b;  border-radius: 8px; font-size: 15px;">verify</a>
-    <br>
-    <h3 style="
-    font-weight: bold;
-    width: 100%;
-    font-size: 18px
-  ">click on the button, obv...</h3>
-</div>
-`,
-  };
-
   try {
-    const hashedToken = await hashString(token);
-    const newVerifiedEmail = await Verification.create({
-      userId: _id,
-      token: hashedToken,
-      createdAt: Date.now(),
-      expiresAt: Date.now() + 3600000,
+    const { _id, email, name } = user;
+    const otp = generateOTP();
+
+    await Verification.findOneAndDelete({ email });
+
+    const newVerifiedEmail = new Verification({
+      email,
+      otp,
     });
+
+    await newVerifiedEmail.save();
+
+    const mailOptions = {
+      to: email,
+      subject: 'Birb Email Verification',
+      html: `
+          <div>
+      <div
+      style="
+        font-family: sans-serif;
+        font-size: 20px;
+        color: #a3bffa;
+        background-color: #000;
+        padding: 20px;
+        border-radius: 30px;
+        text-align: center;
+        padding-bottom: 30px;
+      "
+    >
+      <p style="font-size: 15px; color: #f0f8ff; text-align: center">birb</p>
+      <h3 style="font-weight: bold; width: 100%; font-size: 25px; color:#f5d0fe
+      ">
+        Your OTP's here, "${name}"
+      </h3>
+      <hr />
+      <br />
+      <div
+        style="
+          font-weight: bold;
+          color: aliceblue;
+          padding: 14px;
+          text-decoration: none;
+          background-color: #3c366b;
+          border-radius: 8px;
+          font-size: 20px;
+        "
+      >
+        ${otp}
+      </div>
+      <br />
+      <h3 style="font-weight: bold; width: 100%; font-size: 18px">
+        🐤 thank me later, brrrr...
+        
+      </h3>
+    </div>
+`,
+    };
 
     if (newVerifiedEmail) {
       transporter

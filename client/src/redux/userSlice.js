@@ -9,6 +9,10 @@ const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
+    userRegister(state, action) {
+      state.user = action.payload;
+      localStorage.setItem('user', JSON.stringify(action.payload));
+    },
     userLogin(state, action) {
       state.user = action.payload;
       localStorage.setItem('user', JSON.stringify(action.payload));
@@ -35,6 +39,7 @@ const userSlice = createSlice({
 });
 
 export const {
+  userRegister,
   userLogin,
   userLogout,
   updateProfile,
