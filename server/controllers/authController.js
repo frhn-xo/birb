@@ -1,7 +1,11 @@
 import Users from '../models/userModel.js';
-import Verification from '../models/emailVerficationModel.js';
+import {
+  Verification,
+  PasswordReset,
+} from '../models/emailVerficationModel.js';
 import {
   sendVerificationEmail,
+  sendResetPasswordEmail,
   hashString,
   compareString,
   createJwt,
@@ -40,7 +44,7 @@ export const register = async (req, res) => {
   }
 };
 
-export const verify = async (req, res) => {
+export const verifyEmail = async (req, res) => {
   try {
     const { otp, email } = req.body;
 
@@ -57,7 +61,7 @@ export const verify = async (req, res) => {
     }
 
     if (verificationRecord.otp !== otp) {
-      return res.status(400).json({ message: 'Invalid OTP' });
+      return res.status(400).json({ message: 'Wrong OTP' });
     }
 
     await Users.findOneAndUpdate({ email }, { verified: true });
@@ -106,6 +110,62 @@ export const login = async (req, res) => {
       user,
       token,
     });
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({ message: error.message });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      throw new Error('Provide Required Fields!');
+    }
+
+    const userExist = await Users.findOne({ email });
+
+    if (userExist && userExist.verified === true) {
+      sendResetPasswordEmail(userExist, res);
+    } else if (userExist && userExist.verified === false) {
+      throw new Error('Your account is not verified. Please register first.');
+    } else {
+      throw new Error('You never had an account. Please register first.');
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({ message: error.message });
+  }
+};
+
+export const newPassword = async (req, res) => {
+  try {
+    const { otp, email, password } = req.body;
+
+    if (!otp || !email || !password) {
+      return res.status(400).json({ message: 'Provide Required Fields!' });
+    }
+
+    const PasswordResetRecord = await PasswordReset.findOne({ email });
+
+    if (!PasswordResetRecord) {
+      return res
+        .status(404)
+        .json({ message: 'Email not found in password-reset records' });
+    }
+
+    if (PasswordResetRecord.otp !== otp) {
+      return res.status(400).json({ message: 'Invalid OTP' });
+    }
+
+    const hashedPassword = await hashString(password.trim());
+
+    await Users.findOneAndUpdate({ email }, { password: hashedPassword });
+
+    await PasswordReset.findOneAndDelete({ email });
+
+    return res.status(200).json({ message: 'Password reset successful' });
   } catch (error) {
     console.log(error);
     res.status(404).json({ message: error.message });

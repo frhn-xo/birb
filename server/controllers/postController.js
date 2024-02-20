@@ -232,6 +232,8 @@ export const deletePost = async (req, res) => {
       return res.status(404).json({ message: 'Post not found' });
     }
 
+    await Comments.deleteMany({ postId: id });
+
     if (deletedPost?.publicId) {
       cloudinary.uploader.destroy(deletedPost.publicId, (error, result) => {
         if (error) {

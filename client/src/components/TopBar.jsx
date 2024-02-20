@@ -23,7 +23,7 @@ const TopBar = ({ setSearchData, setShowSearch }) => {
   } = useForm();
 
   const handleSearch = async (data) => {
-    console.log(data, 'clicked');
+    // console.log(data, 'clicked');
     try {
       const response = await apiRequest({
         url: `/users/search?name=${data.searchString}`,
@@ -32,7 +32,7 @@ const TopBar = ({ setSearchData, setShowSearch }) => {
       });
 
       if (response.status !== 'failed') {
-        console.log(response.data.data);
+        // console.log(response.data.data);
         setSearchData(response.data.data);
         setShowSearch(true);
       } else {

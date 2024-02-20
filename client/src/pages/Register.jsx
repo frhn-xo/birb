@@ -107,13 +107,13 @@ const Register = () => {
         </form>
         <div className="text-indigo-300 text-sm flex flex-col justify-center">
           <p>
-            Already have an account ?{' '}
+            Have an account?{' '}
             <Link to="/login" className="underline">
               Login
             </Link>
           </p>
           <p>
-            Already got otp ?{' '}
+            {'Already got OTP ? '}
             <Link to="/verify" className="underline">
               Verify
             </Link>

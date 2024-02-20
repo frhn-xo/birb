@@ -75,12 +75,12 @@ const Profile = ({ searchData, showSearch, setSearchData, setShowSearch }) => {
       >
         <TopBar setSearchData={setSearchData} setShowSearch={setShowSearch} />
         <div className="w-full flex gap-2 lg:gap-4 pb-10 h-full">
-          {/* LEFT */}
+          {/* left */}
           <div className="hidden w-1/3 lg:w-1/4 md:flex flex-col gap-6 overflow-y-auto">
             <ProfileCard user={userInfo} />
           </div>
 
-          {/* CENTER */}
+          {/* center */}
           {showSearch ? (
             <UserList data={searchData} title="users" />
           ) : (
@@ -92,7 +92,7 @@ const Profile = ({ searchData, showSearch, setSearchData, setShowSearch }) => {
             </div>
           )}
 
-          {/* RIGHT */}
+          {/* right */}
           <div className="hidden w-1/3 lg:w-1/4 h-full md:flex flex-col gap-6 overflow-y-auto ">
             <UserList title="friends" data={userInfo.friends} />
           </div>

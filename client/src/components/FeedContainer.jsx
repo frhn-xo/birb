@@ -17,7 +17,7 @@ const FeedContainer = () => {
   const [didDelete, setDidDelete] = useState(true);
 
   useEffect(() => {
-    console.log('inside rerender');
+    // console.log('inside rerender');
     const fetchData = async () => {
       try {
         dispatch(getPostsStart());

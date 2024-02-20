@@ -25,7 +25,7 @@ const EditProfile = () => {
 
   const handleEditSubmit = async (data) => {
     try {
-      console.log(data.name, data.bio);
+      // console.log(data.name, data.bio);
       setPosting(true);
 
       const formData = new FormData();
@@ -43,7 +43,7 @@ const EditProfile = () => {
         }
       }
 
-      console.log(formData, ' - formdata');
+      // console.log(formData, ' - formdata');
 
       const res = await apiRequest({
         url: '/users/update-user',
@@ -65,7 +65,7 @@ const EditProfile = () => {
           token: res?.data?.token,
           ...res?.data?.user,
         };
-        console.log('userData ', userData);
+        // console.log('userData ', userData);
         dispatch(userLogin(userData));
       }
     } catch (error) {

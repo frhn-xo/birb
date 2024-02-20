@@ -1,7 +1,6 @@
 import express from 'express';
 import path from 'path';
 import {
-  verifyEmail,
   getUser,
   updateUser,
   friendRequest,
@@ -15,12 +14,6 @@ import userAuth from '../middlewares/authMiddleware.js';
 import { diskUpload } from '../utils/diskUpload.js';
 
 const router = express.Router();
-const __dirname = path.resolve(path.dirname(''));
-
-router.get('/verify/:userId/:token', verifyEmail);
-router.get('/verified', (req, res) => {
-  res.sendFile(path.join(__dirname, './views/verifiedpage.html'));
-});
 
 router.get('/get-user/:id?', userAuth, getUser);
 router.put('/update-user', userAuth, diskUpload.single('image'), updateUser);

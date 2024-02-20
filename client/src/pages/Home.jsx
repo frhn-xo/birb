@@ -67,7 +67,7 @@ const Home = ({ searchData, showSearch, setSearchData, setShowSearch }) => {
         }
       }
 
-      console.log(formData, ' - formdata', data.description);
+      // console.log(formData, ' - formdata', data.description);
 
       const response = await apiRequest({
         url: '/posts/create-post',

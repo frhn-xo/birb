@@ -13,6 +13,7 @@ import { useDispatch } from 'react-redux';
 const CommentForm = ({ user, postId, getCommentsPost }) => {
   const [loading, setLoading] = useState(false);
   const [errMsg, setErrMsg] = useState('');
+  const dispatch = useDispatch();
   const {
     register,
     handleSubmit,
@@ -21,7 +22,7 @@ const CommentForm = ({ user, postId, getCommentsPost }) => {
   } = useForm({ mode: 'onChange' });
   const onSubmit = async (data) => {
     try {
-      console.log(data);
+      // console.log(data);
       setLoading(true);
       const res = await apiRequest({
         url: `/posts/comment/${postId}`,
@@ -125,7 +126,7 @@ const PostCard = ({ post, user, setDidDelete }) => {
   };
   const deletePost = async () => {
     try {
-      console.log('delete mara');
+      // console.log('delete mara');
       setDidDelete(true);
       const deleteResponse = await apiRequest({
         url: `/posts/${post._id}`,
@@ -134,7 +135,7 @@ const PostCard = ({ post, user, setDidDelete }) => {
       });
       if (deleteResponse.data.success) {
         dispatch(deletePostById(post._id));
-        console.log(deleteResponse.data.message);
+        // console.log(deleteResponse.data.message);
       } else {
         console.log('failed to delete');
       }
@@ -150,7 +151,7 @@ const PostCard = ({ post, user, setDidDelete }) => {
         method: 'get',
         token: user.token,
       });
-      console.log(comments);
+      // console.log(comments);
       if (!comments.data.success) {
         console.log('failed to get comments');
       } else {
@@ -245,7 +246,9 @@ const PostCard = ({ post, user, setDidDelete }) => {
             <BiComment size={24} className="text-fuchsia-400" />
           )}
 
-          {post?.comments?.length}
+          {post?.comments?.length > comments.length
+            ? post?.comments?.length
+            : comments.length}
         </p>
         {user?._id === post?.userId?._id && (
           <div
@@ -287,7 +290,7 @@ const PostCard = ({ post, user, setDidDelete }) => {
                       </p>
                     </Link>
                     <span className="text-xs opacity-50">
-                      {moment(post?.createdAt ?? '2023-05-25').fromNow()}
+                      {moment(comment?.createdAt ?? '2023-05-25').fromNow()}
                     </span>
                   </div>
                 </div>

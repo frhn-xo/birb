@@ -33,7 +33,7 @@ const ProfileCard = ({ user: profile }) => {
         data: { requestTo: profile._id },
         token: user?.token,
       });
-      console.log('Friend request status - ', response.status);
+      // console.log('Friend request status - ', response.status);
       if (response.status === 'success') {
         const outListProfile = {
           _id: profile._id,
@@ -55,7 +55,7 @@ const ProfileCard = ({ user: profile }) => {
         data: { status: 'Accepted', requestBy: profile._id },
         token: user?.token,
       });
-      console.log('Friend accept status - ', response.status);
+      // console.log('Friend accept status - ', response.status);
 
       if (response.status === 'success') {
         const friendProfile = {
@@ -81,7 +81,7 @@ const ProfileCard = ({ user: profile }) => {
         data: { status: 'Rejected', requestBy: profile._id },
         token: user?.token,
       });
-      console.log('Friend accept status - ', response.status);
+      // console.log('Friend accept status - ', response.status);
 
       if (response.status === 'success') {
         // const friendProfile = {

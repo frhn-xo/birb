@@ -31,7 +31,7 @@ const Login = () => {
       } else {
         setErrMsg(res);
         const userData = { token: res?.data?.token, ...res?.data?.user };
-        console.log('userData ', userData);
+        // console.log('userData ', userData);
         dispatch(userLogin(userData));
         setTimeout(() => {
           window.location.replace('/');
