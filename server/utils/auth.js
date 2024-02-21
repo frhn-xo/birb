@@ -7,6 +7,8 @@ import {
   PasswordReset,
 } from '../models/emailVerficationModel.js';
 
+dotenv.config();
+
 // jwt and bcrypt hashing
 
 export const hashString = async (password) => {
@@ -32,8 +34,8 @@ const transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: 'frhndevauth@gmail.com',
-    pass: 'ylyeplrfmxbaaulq',
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
 
