@@ -63,12 +63,11 @@ export const search = async (req, res) => {
 };
 
 export const updateUser = async (req, res) => {
-  let image = req.file;
   try {
     const { name, bio } = req.body;
     const { userId } = req.user;
 
-    if (!(name || bio || image)) {
+    if (!(name || bio || req?.file)) {
       return res.status(400).json({
         success: false,
         message: 'Please provide all required fields',
@@ -87,11 +86,12 @@ export const updateUser = async (req, res) => {
       });
     }
 
+    let image = null;
     let publicId = null;
 
     const user = await Users.findById(userId);
 
-    if (image) {
+    if (req?.file) {
       if (user?.publicId) {
         await cloudinary.uploader.destroy(user.publicId, (error, result) => {
           if (error) {
@@ -102,13 +102,33 @@ export const updateUser = async (req, res) => {
         });
       }
 
-      const uploadedResponse = await cloudinary.uploader.upload(image.path, {
-        folder: 'birb',
-        quality: 'auto',
-      });
-      fs.unlinkSync(`uploads/${image.filename}`);
-      image = uploadedResponse.secure_url;
-      publicId = uploadedResponse.public_id;
+      const bufferImageData = req.file.buffer;
+
+      const uploadToCloudinary = () => {
+        return new Promise((resolve, reject) => {
+          const uploadOptions = {
+            folder: 'birb',
+            resource_type: 'image',
+            quality: 'auto',
+          };
+
+          cloudinary.uploader
+            .upload_stream(uploadOptions, (error, cloudinaryResult) => {
+              if (error) {
+                console.error(error);
+                reject('Error uploading image to Cloudinary.');
+              } else {
+                // console.log(cloudinaryResult);
+                image = cloudinaryResult.secure_url;
+                publicId = cloudinaryResult.public_id;
+                resolve();
+              }
+            })
+            .end(bufferImageData);
+        });
+      };
+
+      await uploadToCloudinary();
     }
 
     const updateUser = {

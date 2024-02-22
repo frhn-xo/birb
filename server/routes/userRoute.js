@@ -16,7 +16,7 @@ const router = express.Router();
 
 router.get('/get-user/:id?', userAuth, getUser);
 
-router.put('/update-user', userAuth, upload.single('file'), updateUser);
+router.put('/update-user', userAuth, upload.single('image'), updateUser);
 
 router.get('/search', userAuth, search);
 
