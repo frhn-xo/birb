@@ -88,7 +88,7 @@ export const updateUser = async (req, res) => {
 
     const user = await Users.findById(userId);
 
-    console.log(user);
+    // console.log(user);
 
     let image = user.image ?? null;
     let publicId = user.publicId ?? null;
