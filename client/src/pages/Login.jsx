@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CustomButton, TextInput } from '../components';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { userLogin } from '../redux/userSlice';
 import { apiRequest } from '../utils';
@@ -10,6 +10,7 @@ const Login = () => {
   const [errMsg, setErrMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const dispatch = useDispatch();
+  const navigateTo = useNavigate();
 
   const {
     register,
@@ -34,7 +35,7 @@ const Login = () => {
         // console.log('userData ', userData);
         dispatch(userLogin(userData));
         setTimeout(() => {
-          window.location.replace('/');
+          navigateTo('/');
         }, 500);
       }
     } catch (error) {

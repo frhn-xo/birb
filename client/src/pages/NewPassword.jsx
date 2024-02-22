@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CustomButton, TextInput } from '../components';
 import { useForm } from 'react-hook-form';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { apiRequest } from '../utils';
 import { useSelector } from 'react-redux';
 
@@ -9,6 +9,7 @@ const NewPassword = () => {
   const [errMsg, setErrMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const user = useSelector((state) => state.user);
+  const navigateTo = useNavigate();
 
   const {
     register,
@@ -31,7 +32,7 @@ const NewPassword = () => {
       } else {
         setErrMsg(res);
         setTimeout(() => {
-          window.location.replace('/login');
+          navigateTo('/login');
         }, 800);
       }
     } catch (error) {
