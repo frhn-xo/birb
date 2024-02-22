@@ -86,10 +86,12 @@ export const updateUser = async (req, res) => {
       });
     }
 
-    let image = null;
-    let publicId = null;
-
     const user = await Users.findById(userId);
+
+    console.log(user);
+
+    let image = user.image ?? null;
+    let publicId = user.publicId ?? null;
 
     if (req?.file) {
       if (user?.publicId) {
