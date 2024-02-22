@@ -3,14 +3,11 @@ import Users from '../models/userModel.js';
 import Comments from '../models/commentModel.js';
 import mongoose from 'mongoose';
 import { v2 as cloudinary } from 'cloudinary';
-import fs from 'fs';
 
 export const createPost = async (req, res) => {
-  let image = req.file;
   try {
     const { userId } = req.user;
     const { description } = req.body;
-    console.log(req.body);
 
     if (!description) {
       return res
@@ -18,17 +15,37 @@ export const createPost = async (req, res) => {
         .json({ message: 'You must provide a description' });
     }
 
+    let image = null;
     let publicId = null;
 
-    if (image) {
-      const uploadedResponse = await cloudinary.uploader.upload(image.path, {
-        folder: 'birb',
-        quality: 'auto',
-      });
-      fs.unlinkSync(`uploads/${image.filename}`);
-      image = uploadedResponse.secure_url;
-      publicId = uploadedResponse.public_id;
-      console.log('public id ', publicId);
+    if (req?.file) {
+      const bufferImageData = req.file.buffer;
+
+      const uploadToCloudinary = () => {
+        return new Promise((resolve, reject) => {
+          const uploadOptions = {
+            folder: 'birb',
+            resource_type: 'image',
+            quality: 'auto',
+          };
+
+          cloudinary.uploader
+            .upload_stream(uploadOptions, (error, cloudinaryResult) => {
+              if (error) {
+                console.error(error);
+                reject('Error uploading image to Cloudinary.');
+              } else {
+                // console.log(cloudinaryResult);
+                image = cloudinaryResult.secure_url;
+                publicId = cloudinaryResult.public_id;
+                resolve();
+              }
+            })
+            .end(bufferImageData);
+        });
+      };
+
+      await uploadToCloudinary();
     }
 
     const post = await Posts.create({
@@ -44,10 +61,7 @@ export const createPost = async (req, res) => {
       data: post,
     });
   } catch (error) {
-    if (image) {
-      fs.unlinkSync(`uploads/${image.filename}`);
-    }
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: 'Internal Server Error' });
   }
 };

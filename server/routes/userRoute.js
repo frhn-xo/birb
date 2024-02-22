@@ -1,5 +1,4 @@
 import express from 'express';
-import path from 'path';
 import {
   getUser,
   updateUser,
@@ -11,12 +10,13 @@ import {
   search,
 } from '../controllers/userController.js';
 import userAuth from '../middlewares/authMiddleware.js';
-import { diskUpload } from '../utils/diskUpload.js';
+import { upload } from '../utils/memoryUpload.js';
 
 const router = express.Router();
 
 router.get('/get-user/:id?', userAuth, getUser);
-router.put('/update-user', userAuth, diskUpload.single('image'), updateUser);
+
+router.put('/update-user', userAuth, upload.single('file'), updateUser);
 
 router.get('/search', userAuth, search);
 

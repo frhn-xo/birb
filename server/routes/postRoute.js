@@ -1,6 +1,6 @@
 import express from 'express';
 import userAuth from '../middlewares/authMiddleware.js';
-import { diskUpload } from '../utils/diskUpload.js';
+import { upload } from '../utils/memoryUpload.js';
 import {
   createPost,
   deletePost,
@@ -18,7 +18,7 @@ router.get('/', userAuth, getPosts);
 
 router.get('/:id', userAuth, getSinglePost);
 
-router.post('/create-post', userAuth, diskUpload.single('image'), createPost);
+router.post('/create-post', userAuth, upload.single('image'), createPost);
 
 router.get('/get-user-post/:id', userAuth, getUserPosts);
 
