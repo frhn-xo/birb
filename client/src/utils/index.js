@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const API_URL = 'http://localhost:8800';
+export const API_URL = 'https://birb-2dai.onrender.com';
 
 export const API = axios.create({ baseURL: API_URL, responseType: 'json' });
 
