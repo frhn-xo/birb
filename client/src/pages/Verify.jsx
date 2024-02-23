@@ -18,7 +18,7 @@ const Verify = () => {
   } = useForm({ mode: 'onSubmit' });
 
   const onSubmit = async (data) => {
-    console.log({ ...data, email: user?.user?.email });
+    // console.log({ ...data, email: user?.user?.email });
     setIsSubmitting(true);
     try {
       const res = await apiRequest({

@@ -99,7 +99,7 @@ export const updateUser = async (req, res) => {
           if (error) {
             console.error('Error deleting image:', error);
           } else {
-            console.log('Image deleted successfully:', result);
+            // console.log('Image deleted successfully:', result);
           }
         });
       }

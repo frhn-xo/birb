@@ -29,7 +29,7 @@ const Profile = ({ searchData, showSearch, setSearchData, setShowSearch }) => {
         if (responseProfile.status === 'failed') {
           console.log(responseProfile.message);
         } else {
-          console.log('profile page useeffect ', responseProfile.data);
+          // console.log('profile page useeffect ', responseProfile.data);
           setUserInfo(responseProfile.data.user);
           if (user._id === responseProfile.data.user._id) {
             const userData = {
@@ -63,7 +63,7 @@ const Profile = ({ searchData, showSearch, setSearchData, setShowSearch }) => {
       }
     };
     fetchUser();
-  }, [id]);
+  }, []);
 
   return (
     <>
@@ -86,9 +86,9 @@ const Profile = ({ searchData, showSearch, setSearchData, setShowSearch }) => {
           ) : (
             <div className="flex-1 h-full bg-black flex flex-col overflow-y-auto rounded-xl">
               <div className="visible md:hidden">
-                <ProfileCard user={userInfo} />
+                <ProfileCard userInfoId={userInfo._id} />
               </div>
-              <FeedContainer userInfoId={userInfo._id} />
+              <FeedContainer />
             </div>
           )}
 

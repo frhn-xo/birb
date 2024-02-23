@@ -17,21 +17,20 @@ const FeedContainer = () => {
   const [didDelete, setDidDelete] = useState(true);
 
   useEffect(() => {
-    // console.log('inside rerender');
     const fetchData = async () => {
       try {
         dispatch(getPostsStart());
         let response;
 
         if (id) {
-          console.log('Fetching user posts for user id:', id);
+          // console.log('Fetching user posts for user id:', id);
           response = await apiRequest({
             url: `/posts/get-user-post/${id}`,
             method: 'get',
             token: user.token,
           });
         } else {
-          console.log('Fetching all posts');
+          // console.log('Fetching all posts');
           response = await apiRequest({
             url: '/posts',
             method: 'get',

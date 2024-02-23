@@ -45,7 +45,7 @@ const TopBar = ({ setSearchData, setShowSearch }) => {
   };
 
   const handleLogout = () => {
-    console.log('loggin out');
+    // console.log('loggin out');
     dispatch(userLogout());
   };
 

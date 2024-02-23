@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { LiaEditSolid } from 'react-icons/lia';
 import { IoSparklesSharp } from 'react-icons/io5';
 import { LuTimer } from 'react-icons/lu';
@@ -18,12 +18,40 @@ import {
   updateInRequest,
 } from '../redux/userSlice';
 
-const ProfileCard = ({ user: profile }) => {
+const ProfileCard = () => {
+  const { id } = useParams();
   const { user } = useSelector((state) => state.user);
+  const [profile, setProfile] = useState(user);
   const dispatch = useDispatch();
   const [showUserList, setShowUserList] = useState(false);
   const [userListData, setuserListData] = useState(user.friends);
   const [userListTitle, setUserListTitle] = useState('friends');
+
+  useEffect(() => {
+    if (id) {
+      const fetchProfile = async () => {
+        let response;
+        // console.log('id hai');
+        try {
+          response = await apiRequest({
+            url: `/users/get-user/${id}`,
+            method: 'get',
+            token: user.token,
+          });
+          // console.log(response.data.user, 'id hai so response');
+          setProfile(response.data.user);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+      fetchProfile();
+    } else {
+      // console.log('id not defined');
+      setProfile(user);
+    }
+  }, [id]);
+
+  // console.log(id, 'in profile card');
 
   const addFriend = async () => {
     try {
@@ -214,7 +242,7 @@ const ProfileCard = ({ user: profile }) => {
                 if (profile?.friends?.length !== 0) {
                   handleFriends();
                 }
-                console.log(profile.friends, 'profile friends', profile);
+                // console.log(profile.friends, 'profile friends', profile);
               }}
               className="hover:bg-indigo-700 p-1 rounded-md"
             >
